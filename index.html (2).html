@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#060D1F" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Élite Comercial | Gestión de Equipo & Convención</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              950: '#060D1F',
+              900: '#0B1633',
+              800: '#13244E',
+              700: '#1D3570',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F1F5F9;
+      color: #0F172A;
+      -webkit-tap-highlight-color: transparent;
+    }
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .gold-gradient {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 55%, #B45309 100%);
+    }
+    .navy-gradient {
+      background: linear-gradient(135deg, #060D1F 0%, #0B1633 55%, #162B5C 100%);
+    }
+    .emerald-gradient {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #E2E8F0;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #94A3B8;
+      border-radius: 9999px;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45); }
+      50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+    }
+    .animate-gold-pulse {
+      animation: pulse-glow 2.5s infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-200 selection:text-navy-900">
+
+  <!-- CONTENEDOR DE NOTIFICACIONES TOAST -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- ===================================================================== -->
+  <!-- 1. CONFIGURACIÓN PRINCIPAL (EDITA AQUÍ ANTES DE SUBIR A GITHUB)       -->
+  <!-- ===================================================================== -->
+  <script>
+    const CONFIG = {
+      // 1. Pega aquí dentro de las comillas la URL /exec que te da Google Apps Script:
+      GOOGLE_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxXV8cXWRzBG2qMYsf1-RdCD56KTJ6nTxSSo7VkBBXl90WzrUYbbF9F3VyuJHWSYvtFfw/exec",
+
+      // 2. Usuario y contraseña del Administrador / Dirección Comercial:
+      ADMIN_USER: "admin",
+      ADMIN_PASS: "2026",
+
+      // 3. Metas por defecto (en pesos COP) para asesores nuevos que se auto-registren:
+      DEFAULT_META_MENSUAL: 15000000,
+      DEFAULT_META_CONVENCION: 120000000,
+
+      // 4. Nombre de tu agencia o equipo comercial:
+      COMPANY_NAME: "Élite Comercial"
+    };
+  </script>
+
+  <!-- ===================================================================== -->
+  <!-- PANTALLA 1: INICIO DE SESIÓN (ASESOR CON AUTO-REGISTRO / ADMIN)       -->
+  <!-- ===================================================================== -->
+  <div id="login-view" class="min-h-screen navy-gradient flex flex-col justify-between p-4 sm:p-6 relative overflow-hidden">
+    <!-- Luces decorativas -->
+    <div class="absolute -top-24 -right-24 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -left-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Header superior -->
+    <header class="max-w-5xl w-full mx-auto flex items-center justify-between z-10">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center shadow-lg shadow-amber-500/20">
+          <i data-lucide="trophy" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <span id="login-brand-name" class="text-white font-display font-bold text-lg tracking-tight block leading-none">ÉLITE COMERCIAL</span>
+          <span class="text-amber-400 text-[11px] font-medium tracking-wider uppercase">Metas & Convención</span>
+        </div>
+      </div>
+
+      <button onclick="openSheetsModal()" title="Configurar conexión Google Sheets" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition border border-white/10">
+        <i data-lucide="settings" class="w-4 h-4 text-amber-400"></i>
+        <span class="hidden sm:inline">Configurar</span>
+      </button>
+    </header>
+
+    <!-- Tarjeta Central de Login -->
+    <main class="max-w-md w-full mx-auto my-auto py-8 z-10">
+      <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+        
+        <!-- Selector de Pestañas: Asesor vs Administrador -->
+        <div class="grid grid-cols-2 bg-slate-100 p-1.5 m-4 mb-0 rounded-2xl">
+          <button type="button" id="login-tab-advisor" onclick="switchLoginTab('advisor')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-display font-bold transition flex items-center justify-center gap-2 bg-white text-navy-900 shadow-sm">
+            <i data-lucide="smartphone" class="w-4 h-4 text-emerald-600"></i>
+            <span>Asesor Comercial</span>
+          </button>
+          <button type="button" id="login-tab-admin" onclick="switchLoginTab('admin')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-display font-bold transition flex items-center justify-center gap-2 text-slate-500 hover:text-navy-900">
+            <i data-lucide="shield-check" class="w-4 h-4 text-amber-500"></i>
+            <span>Administrador</span>
+          </button>
+        </div>
+
+        <div class="p-6 sm:p-8 pt-6">
+          <!-- FORMULARIO 1: ASESOR COMERCIAL (CELULAR + AUTO-REGISTRO) -->
+          <div id="advisor-login-panel">
+            <div class="text-center mb-6">
+              <h1 class="text-2xl font-display font-extrabold text-navy-900">Portal del Asesor</h1>
+              <p class="text-slate-500 text-sm mt-1">Ingresa tu número celular para reportar tus cierres o crear tu perfil en segundos.</p>
+            </div>
+
+            <!-- Paso A: Digitar Celular -->
+            <form id="advisor-phone-form" onsubmit="handleAdvisorPhoneCheck(event)" class="space-y-4">
+              <div>
+                <label for="advisor-phone-input" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Número de Celular (10 dígitos)</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <span class="text-slate-400 font-semibold text-sm">+57</span>
+                  </div>
+                  <input
+                    type="tel"
+                    id="advisor-phone-input"
+                    inputmode="numeric"
+                    maxlength="10"
+                    placeholder="Ej. 3001234567"
+                    required
+                    class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-navy-900 font-bold text-lg tracking-wide focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+
+              <button type="submit" id="btn-advisor-continue" class="w-full py-3.5 px-5 rounded-2xl emerald-gradient hover:opacity-95 text-white font-display font-bold text-base shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                <span>Continuar</span>
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+              </button>
+            </form>
+
+            <!-- Paso B: Auto-Registro Rápido (se muestra si el teléfono es nuevo) -->
+            <form id="advisor-register-form" onsubmit="handleAdvisorAutoRegister(event)" class="hidden space-y-4">
+              <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-start gap-2.5">
+                <i data-lucide="user-plus" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+                <div>
+                  <p class="text-xs font-bold text-amber-900">¡Bienvenido al equipo! Número nuevo detectado</p>
+                  <p class="text-[11px] text-amber-800 mt-0.5">Completa tu nombre para activar tu cuenta con el celular <strong id="reg-phone-display" class="font-mono"></strong>.</p>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Tu Nombre Completo *</label>
+                <input
+                  type="text"
+                  id="reg-name-input"
+                  required
+                  placeholder="Ej. Andrés Felipe Gómez"
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-navy-900 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Ciudad / Sucursal (Opcional)</label>
+                <input
+                  type="text"
+                  id="reg-city-input"
+                  placeholder="Ej. Barranquilla / Medellín / Bogotá"
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-navy-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div class="flex gap-2 pt-1">
+                <button type="button" onclick="cancelAutoRegister()" class="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+                  Cambiar N°
+                </button>
+                <button type="submit" id="btn-advisor-register" class="flex-1 py-3 px-4 rounded-2xl navy-gradient hover:opacity-95 text-white font-display font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition">
+                  <span>Crear Perfil e Ingresar</span>
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- FORMULARIO 2: ADMINISTRADOR (USUARIO Y CONTRASEÑA) -->
+          <div id="admin-login-panel" class="hidden">
+            <div class="text-center mb-6">
+              <h1 class="text-2xl font-display font-extrabold text-navy-900">Dirección Comercial</h1>
+              <p class="text-slate-500 text-sm mt-1">Acceso exclusivo para monitoreo global, metas y ranking del equipo.</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Usuario Administrador</label>
+                <div class="relative">
+                  <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                  <input
+                    type="text"
+                    id="admin-user-input"
+                    required
+                    placeholder="Ingresa tu usuario"
+                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-navy-900 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Contraseña</label>
+                <div class="relative">
+                  <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                  <input
+                    type="password"
+                    id="admin-pass-input"
+                    required
+                    placeholder="••••••••"
+                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-navy-900 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <button type="submit" class="w-full py-3.5 px-5 rounded-2xl navy-gradient hover:opacity-95 text-white font-display font-bold text-base shadow-lg shadow-navy-900/25 flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
+                <span>Ingresar al Tablero Directivo</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Pie de tarjeta: Estado de conexión a Google Sheets -->
+        <div id="login-connection-footer" class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+          <div id="connection-status-pill" class="flex items-center gap-2 font-semibold text-amber-700">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <span>Modo Local (Falta configurar URL de Google Sheets)</span>
+          </div>
+          <button type="button" onclick="openSheetsModal()" class="text-navy-800 hover:underline font-bold">Conectar</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="max-w-5xl w-full mx-auto text-center text-slate-400 text-xs z-10">
+      Plataforma Comercial en Tiempo Real • Sincronización en la Nube
+    </footer>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PANTALLA 2: APLICACIÓN PRINCIPAL (ASESOR O ADMINISTRADOR)             -->
+  <!-- ===================================================================== -->
+  <div id="app-view" class="hidden min-h-screen flex-col">
+    <!-- Barra de Navegación Superior -->
+    <header class="navy-gradient text-white sticky top-0 z-30 shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl gold-gradient flex items-center justify-center shadow">
+            <i data-lucide="trophy" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="nav-brand-name" class="font-display font-bold text-base sm:text-lg tracking-tight">ÉLITE COMERCIAL</span>
+              <span id="nav-role-badge" class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">ASESOR</span>
+            </div>
+            <p id="nav-subtitle" class="text-[11px] text-slate-300 hidden sm:block">Seguimiento de Metas y Convención</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+          <!-- Botón Sincronizar -->
+          <button onclick="syncWithSheets(true)" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition border border-white/10" title="Actualizar cifras desde Google Sheets">
+            <i data-lucide="refresh-cw" id="sync-spinner" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span class="hidden md:inline">Sincronizar</span>
+          </button>
+
+          <!-- Botón Configuración / Apps Script (visible para Admin) -->
+          <button id="btn-nav-config" onclick="openSheetsModal()" class="hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-semibold transition border border-amber-400/30">
+            <i data-lucide="code-2" class="w-3.5 h-3.5"></i>
+            <span class="hidden md:inline">Configuración / Apps Script</span>
+          </button>
+
+          <!-- Perfil y Salir -->
+          <div class="flex items-center gap-2.5 pl-2 border-l border-white/15">
+            <div class="text-right hidden sm:block">
+              <p id="nav-user-name" class="text-xs font-bold text-white leading-tight">Usuario</p>
+              <p id="nav-user-phone" class="text-[11px] text-amber-300 font-mono">3000000000</p>
+            </div>
+            <button onclick="logout()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 text-xs font-semibold transition border border-rose-400/20" title="Cerrar sesión">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Salir</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- VISTA A: PANEL DEL ASESOR COMERCIAL                                 -->
+    <!-- =================================================================== -->
+    <main id="advisor-dashboard" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+      
+      <!-- Banner Ejecutivo & Termómetro Rumbo a Convención -->
+      <div class="navy-gradient rounded-3xl p-6 sm:p-7 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-amber-300 text-xs font-semibold mb-2">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span>Panel Comercial Personal</span>
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-display font-extrabold">¡Hola, <span id="adv-welcome-name" class="text-amber-400">Asesor</span>!</h2>
+            <p class="text-slate-300 text-sm mt-1">Registra tus cierres en tiempo real; tus cifras actualizan automáticamente el tablero de Dirección.</p>
+          </div>
+
+          <button onclick="shareAdvisorWhatsApp()" class="self-start lg:self-auto inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-950/40 transition">
+            <i data-lucide="share-2" class="w-4 h-4"></i>
+            <span>Compartir mi avance por WhatsApp</span>
+          </button>
+        </div>
+
+        <!-- Termómetro Rumbo a Convención -->
+        <div class="mt-6 pt-6 border-t border-white/15 relative z-10">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-2.5">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
+                <span class="font-display font-bold text-base sm:text-lg text-white">Termómetro Rumbo a Convención</span>
+                <span id="adv-conv-badge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-navy-950">Acelerar ritmo</span>
+              </div>
+              <p id="adv-conv-subtitle" class="text-xs text-slate-300 mt-1">Te faltan $0 para clasificar.</p>
+            </div>
+            <div class="text-left sm:text-right">
+              <span id="adv-conv-pct-text" class="text-2xl sm:text-3xl font-display font-extrabold text-amber-400">0%</span>
+              <span id="adv-conv-ratio-text" class="text-xs text-slate-300 block">$0 / $0</span>
+            </div>
+          </div>
+
+          <div class="w-full h-5 bg-navy-950/90 rounded-full p-1 border border-white/10 overflow-hidden">
+            <div id="adv-conv-bar" class="h-full rounded-full gold-gradient transition-all duration-700 ease-out flex items-center justify-end pr-2" style="width: 0%">
+              <span class="w-2 h-2 rounded-full bg-white shadow"></span>
+            </div>
+          </div>
+          <div class="flex justify-between text-[11px] text-slate-400 mt-1.5 font-medium">
+            <span>Inicio ($0)</span>
+            <span>70% Zona de Clasificación</span>
+            <span class="text-amber-400 font-bold">100% CLASIFICADO VIP 🏆</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Tarjetas KPI del Asesor -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Producción del Mes</span>
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="banknote" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="adv-kpi-sales" class="text-2xl font-display font-extrabold text-navy-900">$0</p>
+          <p class="text-xs text-slate-500 mt-1">Meta mes: <strong id="adv-kpi-goal" class="text-slate-700">$0</strong></p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Cumplimiento Mes</span>
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i data-lucide="target" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="adv-kpi-month-pct" class="text-2xl font-display font-extrabold text-navy-900">0%</p>
+          <div class="w-full h-2 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
+            <div id="adv-kpi-month-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pólizas / Negocios</span>
+            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i data-lucide="briefcase" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="adv-kpi-polizas" class="text-2xl font-display font-extrabold text-navy-900">0</p>
+          <p class="text-xs text-slate-500 mt-1">Cierres registrados en el mes</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Posición Ranking</span>
+            <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+              <i data-lucide="medal" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="adv-kpi-rank" class="text-2xl font-display font-extrabold text-navy-900">#1 <span class="text-sm font-normal text-slate-400">de 1</span></p>
+          <p class="text-xs text-emerald-600 font-medium mt-1">Clasificación general equipo</p>
+        </div>
+      </div>
+
+      <!-- Formulario de Reporte + Historial Propio -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Formulario -->
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 sticky top-20">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-2xl emerald-gradient text-white flex items-center justify-center shadow">
+                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-display font-bold text-lg text-navy-900">Reportar Nuevo Cierre</h3>
+                <p class="text-xs text-slate-500">Se sincroniza al instante con el Administrador</p>
+              </div>
+            </div>
+
+            <form onsubmit="handleAddReport(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Nombre del Cliente / Empresa *</label>
+                <input type="text" id="rep-cliente" required placeholder="Ej. Inversiones Caribe S.A.S / María López" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Ramo / Producto *</label>
+                  <select id="rep-ramo" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="Salud">Salud</option>
+                    <option value="Autos">Autos</option>
+                    <option value="Vida">Vida</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Empresarial">Empresarial</option>
+                    <option value="ARL">ARL</option>
+                    <option value="Otros">Otros</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Fecha de Cierre *</label>
+                  <input type="date" id="rep-fecha" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Valor Prima / Venta ($ COP) *</label>
+                  <input type="number" id="rep-valor" required min="10000" step="1000" placeholder="Ej. 3500000" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Cant. Pólizas / Negocios *</label>
+                  <input type="number" id="rep-polizas" required min="1" max="500" value="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                </div>
+              </div>
+
+              <button type="submit" id="btn-submit-report" class="w-full py-3.5 px-5 rounded-2xl emerald-gradient hover:opacity-95 text-white font-display font-bold text-sm shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                <i data-lucide="send" class="w-4 h-4"></i>
+                <span>Guardar Cierre y Sumar a Meta</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Historial de Reportes Propios -->
+        <div class="lg:col-span-7">
+          <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80">
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <h3 class="font-display font-bold text-lg text-navy-900">Mis Cierres Reportados</h3>
+                <p class="text-xs text-slate-500">Historial actualizado de tu producción personal</p>
+              </div>
+              <span id="adv-reports-count" class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">0 cierres</span>
+            </div>
+
+            <div id="adv-reports-list" class="space-y-3">
+              <!-- Render dinámico -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- VISTA B: PANEL DE ADMINISTRADOR / DIRECCIÓN COMERCIAL               -->
+    <!-- =================================================================== -->
+    <main id="admin-dashboard" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+      
+      <!-- Encabezado y Pestañas Admin -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-navy-900">Tablero Directivo Comercial</h2>
+          <p class="text-sm text-slate-500">Consolidado en vivo de <strong id="adm-team-count" class="text-navy-900">0 asesores</strong> registrados en la plataforma.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200/80 self-start">
+          <button onclick="switchAdminTab('ranking')" id="adm-tab-ranking" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-navy-900 text-white shadow">
+            Ranking & Gráficos
+          </button>
+          <button onclick="switchAdminTab('advisors')" id="adm-tab-advisors" class="px-4 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-100">
+            Equipo y Metas
+          </button>
+          <button onclick="switchAdminTab('reports')" id="adm-tab-reports" class="px-4 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-100">
+            Todos los Cierres
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 KPIs Globales del Equipo -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="navy-gradient text-white rounded-2xl p-5 shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Producción Total Mes</span>
+            <div class="w-9 h-9 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center">
+              <i data-lucide="trending-up" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="adm-kpi-sales" class="text-2xl sm:text-3xl font-display font-extrabold text-white">$0</p>
+          <p class="text-xs text-slate-300 mt-1.5">Meta grupal: <strong id="adm-kpi-goal" class="text-white">$0</strong></p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Cumplimiento Global</span>
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="percent" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="adm-kpi-pct" class="text-2xl sm:text-3xl font-display font-extrabold text-navy-900">0%</p>
+          <div class="w-full h-2 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
+            <div id="adm-kpi-pct-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pólizas / Negocios</span>
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i data-lucide="file-check-2" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <p id="adm-kpi-polizas" class="text-2xl sm:text-3xl font-display font-extrabold text-navy-900">0</p>
+          <p class="text-xs text-slate-500 mt-1.5">En <strong id="adm-kpi-reports-count" class="text-slate-700">0</strong> cierres reportados</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Clasificados Convención</span>
+            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i data-lucide="trophy" class="w-5 h-5"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <p id="adm-kpi-qualified" class="text-2xl sm:text-3xl font-display font-extrabold text-navy-900">0</p>
+            <span class="text-xs font-semibold text-amber-700">VIP (100%+)</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1.5"><strong id="adm-kpi-zone" class="text-emerald-600">0</strong> en zona de clasificación (&ge;70%)</p>
+        </div>
+      </div>
+
+      <!-- SUB-VISTA ADMIN 1: RANKING & GRÁFICOS -->
+      <div id="adm-panel-ranking" class="space-y-6">
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-8 bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-display font-bold text-base sm:text-lg text-navy-900">Comparativo de Ventas vs Meta por Asesor</h3>
+                <p class="text-xs text-slate-500">Cifras expresadas en millones de pesos ($M COP)</p>
+              </div>
+            </div>
+            <div class="h-64 sm:h-72 w-full">
+              <canvas id="adminSalesBarChart"></canvas>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80">
+            <div class="mb-4">
+              <h3 class="font-display font-bold text-base sm:text-lg text-navy-900">Participación por Ramo</h3>
+              <p class="text-xs text-slate-500">Distribución de prima por línea</p>
+            </div>
+            <div class="h-64 sm:h-72 w-full flex items-center justify-center">
+              <canvas id="adminRamoChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Posiciones / Ranking en Vivo -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+          <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="font-display font-bold text-lg text-navy-900 flex items-center gap-2">
+                <i data-lucide="award" class="w-5 h-5 text-amber-500"></i>
+                <span>Tabla de Posiciones & Estado de Convención</span>
+              </h3>
+              <p class="text-xs text-slate-500">Ranking ordenado por producción acumulada</p>
+            </div>
+
+            <button onclick="openAdvisorModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl navy-gradient text-white text-xs font-bold shadow hover:opacity-95 transition self-start sm:self-auto">
+              <i data-lucide="user-plus" class="w-4 h-4 text-amber-400"></i>
+              <span>Agregar Asesor</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/70">
+                  <th class="py-3.5 px-4">Pos</th>
+                  <th class="py-3.5 px-4">Asesor Comercial</th>
+                  <th class="py-3.5 px-4 text-right">Producción</th>
+                  <th class="py-3.5 px-4">Meta Mensual</th>
+                  <th class="py-3.5 px-4">Rumbo Convención</th>
+                  <th class="py-3.5 px-4 text-center">Estado</th>
+                  <th class="py-3.5 px-4 text-right">Metas</th>
+                </tr>
+              </thead>
+              <tbody id="adm-ranking-tbody" class="divide-y divide-slate-100 text-sm">
+                <!-- Filas dinámicas -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-VISTA ADMIN 2: GESTIÓN DE EQUIPO Y METAS -->
+      <div id="adm-panel-advisors" class="hidden bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h3 class="font-display font-bold text-lg text-navy-900">Directorio del Equipo Comercial</h3>
+            <p class="text-xs text-slate-500">Edita metas individuales o registra asesores manualmente</p>
+          </div>
+          <button onclick="openAdvisorModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl navy-gradient text-white text-xs font-bold shadow self-start">
+            <i data-lucide="user-plus" class="w-4 h-4 text-amber-400"></i>
+            <span>Nuevo Asesor</span>
+          </button>
+        </div>
+
+        <div id="adm-advisors-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Tarjetas de asesores -->
+        </div>
+      </div>
+
+      <!-- SUB-VISTA ADMIN 3: TODOS LOS CIERRES DEL EQUIPO -->
+      <div id="adm-panel-reports" class="hidden bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h3 class="font-display font-bold text-lg text-navy-900">Registro Detallado de Cierres</h3>
+            <p class="text-xs text-slate-500">Filtra por asesor o ramo y descarga el consolidado en Excel (CSV)</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="filter-report-advisor" onchange="renderAdminReportsList()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none">
+              <option value="all">Todos los asesores</option>
+            </select>
+
+            <select id="filter-report-ramo" onchange="renderAdminReportsList()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none">
+              <option value="all">Todos los ramos</option>
+              <option value="Salud">Salud</option>
+              <option value="Autos">Autos</option>
+              <option value="Vida">Vida</option>
+              <option value="Hogar">Hogar</option>
+              <option value="Empresarial">Empresarial</option>
+              <option value="ARL">ARL</option>
+              <option value="Otros">Otros</option>
+            </select>
+
+            <button onclick="exportReportsCSV()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl emerald-gradient text-white text-xs font-bold shadow hover:opacity-95 transition">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Exportar a Excel (CSV)</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="adm-reports-list" class="space-y-3">
+          <!-- Lista filtrada de cierres -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: AGREGAR / EDITAR ASESOR Y SUS METAS                          -->
+  <!-- ===================================================================== -->
+  <div id="advisor-modal" class="fixed inset-0 bg-navy-950/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="advisor-modal-title" class="font-display font-bold text-lg text-navy-900">Configurar Asesor y Metas</h3>
+        <button onclick="closeAdvisorModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveAdvisorModal(event)" class="space-y-4">
+        <input type="hidden" id="modal-adv-is-edit" value="0" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Número de Celular (10 dígitos) *</label>
+          <input type="tel" id="modal-adv-phone" maxlength="10" required placeholder="Ej. 3001234567" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold focus:outline-none focus:ring-2 focus:ring-navy-800" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nombre Completo *</label>
+          <input type="text" id="modal-adv-name" required placeholder="Ej. Valentina Restrepo" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-navy-800" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Meta Mensual de Producción ($ COP) *</label>
+          <input type="number" id="modal-adv-meta-mensual" required min="1000000" step="500000" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Meta Clasificación Convención ($ COP) *</label>
+          <input type="number" id="modal-adv-meta-conv" required min="5000000" step="1000000" class="w-full px-3.5 py-2.5 bg-amber-50/70 border border-amber-200 rounded-xl text-sm font-bold text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeAdvisorModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+          <button type="submit" id="btn-save-advisor-modal" class="px-5 py-2.5 rounded-xl navy-gradient text-white text-xs font-bold shadow">Guardar en la Nube</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: CONFIGURACIÓN / APPS SCRIPT GOOGLE SHEETS                    -->
+  <!-- ===================================================================== -->
+  <div id="sheets-modal" class="fixed inset-0 bg-navy-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 my-auto max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <i data-lucide="database" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-lg text-navy-900">Conexión con Google Sheets</h3>
+            <p class="text-xs text-slate-500">Prueba una URL temporalmente o copia el código Apps Script</p>
+          </div>
+        </div>
+        <button onclick="closeSheetsModal()" class="p-2 rounded-xl text-slate-400 hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <label class="block text-xs font-bold uppercase tracking-wider text-navy-900 mb-1.5">Probar URL Web App (/exec) en este navegador</label>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="url" id="modal-sheets-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            <button type="button" onclick="saveTempSheetsUrl()" class="px-4 py-2.5 rounded-xl emerald-gradient text-white text-xs font-bold shadow whitespace-nowrap">
+              Probar y Sincronizar
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-2">
+            💡 <strong>Para que les funcione a todos en GitHub:</strong> Pega esta misma URL dentro de <code class="bg-slate-200 px-1 rounded">GOOGLE_SCRIPT_URL: ""</code> al inicio del archivo <code class="bg-slate-200 px-1 rounded">index.html</code> antes de subirlo.
+          </p>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-navy-900">Código Google Apps Script (Compatible con esta App)</span>
+            <button type="button" onclick="copyAppsScriptCode()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-navy-900 hover:bg-navy-800 text-white text-xs font-semibold transition">
+              <i data-lucide="copy" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>Copiar Código Apps Script</span>
+            </button>
+          </div>
+          <pre id="apps-script-template" class="bg-navy-950 text-emerald-300 p-4 rounded-2xl text-[11px] font-mono overflow-x-auto max-h-56 leading-relaxed select-all">const SHEET_ASESORES = "Asesores";
+const SHEET_REPORTES = "Reportes";
+
+function doGet(e) { return handleRequest(e); }
+function doPost(e) { return handleRequest(e); }
+
+function handleRequest(e) {
+  const lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    inicializarHojas(ss);
+    const action = (e && e.parameter && e.parameter.action) || "sync";
+    let payload = {};
+    if (e && e.postData && e.postData.contents) {
+      try { payload = JSON.parse(e.postData.contents); } catch (err) {}
+    }
+    const finalAction = payload.action || action;
+
+    if (finalAction === "register_advisor" || finalAction === "update_advisor") {
+      const sheet = ss.getSheetByName(SHEET_ASESORES);
+      const data = sheet.getDataRange().getValues();
+      const phone = String(payload.phone || "").replace(/\D/g, "");
+      const name = String(payload.name || "").trim();
+      const metaMensual = Number(payload.metaMensual) || 15000000;
+      const metaConvencion = Number(payload.metaConvencion) || 120000000;
+      if (!phone || !name) return jsonResponse({ status: "error", message: "Faltan datos" });
+
+      let foundRow = -1;
+      for (let i = 1; i < data.length; i++) {
+        if (String(data[i][0]).replace(/\D/g, "") === phone) { foundRow = i + 1; break; }
+      }
+      if (foundRow > -1) {
+        sheet.getRange(foundRow, 2).setValue(name);
+        sheet.getRange(foundRow, 3).setValue(metaMensual);
+        sheet.getRange(foundRow, 4).setValue(metaConvencion);
+      } else {
+        sheet.appendRow([phone, name, metaMensual, metaConvencion, new Date()]);
+      }
+      return jsonResponse({ status: "ok", data: obtenerTodo(ss) });
+    }
+
+    if (finalAction === "add_report") {
+      const sheet = ss.getSheetByName(SHEET_REPORTES);
+      const id = payload.id || ("REP-" + new Date().getTime());
+      const fecha = payload.fecha || Utilities.formatDate(new Date(), "America/Bogota", "yyyy-MM-dd");
+      const phone = String(payload.phone || "").replace(/\D/g, "");
+      const asesor = String(payload.asesor || "");
+      const cliente = String(payload.cliente || "Cliente General");
+      const ramo = String(payload.ramo || "Otros");
+      const valor = Number(payload.valor) || 0;
+      const polizas = Number(payload.polizas) || 1;
+      sheet.appendRow([id, fecha, phone, asesor, cliente, ramo, valor, polizas, new Date()]);
+      return jsonResponse({ status: "ok", data: obtenerTodo(ss) });
+    }
+
+    if (finalAction === "delete_report") {
+      const sheet = ss.getSheetByName(SHEET_REPORTES);
+      const data = sheet.getDataRange().getValues();
+      const targetId = String(payload.id || "");
+      for (let i = 1; i < data.length; i++) {
+        if (String(data[i][0]) === targetId) { sheet.deleteRow(i + 1); break; }
+      }
+      return jsonResponse({ status: "ok", data: obtenerTodo(ss) });
+    }
+
+    return jsonResponse({ status: "ok", data: obtenerTodo(ss) });
+  } catch (error) {
+    return jsonResponse({ status: "error", message: error.toString() });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function inicializarHojas(ss) {
+  let sA = ss.getSheetByName(SHEET_ASESORES);
+  if (!sA) {
+    sA = ss.insertSheet(SHEET_ASESORES);
+    sA.appendRow(["Telefono", "Nombre", "MetaMensual", "MetaConvencion", "FechaRegistro"]);
+    sA.getRange("A1:E1").setFontWeight("bold").setBackground("#0f172a").setFontColor("#ffffff");
+  }
+  let sR = ss.getSheetByName(SHEET_REPORTES);
+  if (!sR) {
+    sR = ss.insertSheet(SHEET_REPORTES);
+    sR.appendRow(["ID", "Fecha", "Telefono", "Asesor", "Cliente", "Ramo", "Valor", "Polizas", "Timestamp"]);
+    sR.getRange("A1:I1").setFontWeight("bold").setBackground("#0f172a").setFontColor("#ffffff");
+  }
+}
+
+function obtenerTodo(ss) {
+  const rawA = ss.getSheetByName(SHEET_ASESORES).getDataRange().getValues();
+  const asesores = [];
+  for (let i = 1; i < rawA.length; i++) {
+    if (rawA[i][0]) {
+      asesores.push({
+        phone: String(rawA[i][0]).replace(/\D/g, ""),
+        name: String(rawA[i][1]),
+        metaMensual: Number(rawA[i][2]) || 15000000,
+        metaConvencion: Number(rawA[i][3]) || 120000000
+      });
+    }
+  }
+  const rawR = ss.getSheetByName(SHEET_REPORTES).getDataRange().getValues();
+  const reportes = [];
+  for (let i = 1; i < rawR.length; i++) {
+    if (rawR[i][0]) {
+      let f = rawR[i][1];
+      if (f instanceof Date) f = Utilities.formatDate(f, "America/Bogota", "yyyy-MM-dd");
+      reportes.push({
+        id: String(rawR[i][0]), fecha: String(f),
+        phone: String(rawR[i][2]).replace(/\D/g, ""), asesor: String(rawR[i][3]),
+        cliente: String(rawR[i][4]), ramo: String(rawR[i][5]),
+        valor: Number(rawR[i][6]) || 0, polizas: Number(rawR[i][7]) || 1
+      });
+    }
+  }
+  return { asesores: asesores, reportes: reportes };
+}
+
+function jsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- LÓGICA DE APLICACIÓN, SINCRONIZACIÓN CORS-SAFE Y GRÁFICOS             -->
+  <!-- ===================================================================== -->
+  <script>
+    let appState = {
+      asesores: [],
+      reportes: [],
+      session: null, // { role: 'advisor' | 'admin', phone?: string, name: string }
+      pendingPhone: '',
+      salesChart: null,
+      ramoChart: null
+    };
+
+    // Obtener URL efectiva (prioriza CONFIG.GOOGLE_SCRIPT_URL y luego prueba local)
+    function getScriptUrl() {
+      const cfgUrl = (CONFIG.GOOGLE_SCRIPT_URL || '').trim();
+      if (cfgUrl) return cfgUrl;
+      return (localStorage.getItem('elite_temp_sheets_url') || '').trim();
+    }
+
+    // Inicialización al cargar DOM
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Aplicar nombre de marca configurado
+      const brand = CONFIG.COMPANY_NAME || 'Élite Comercial';
+      document.getElementById('login-brand-name').textContent = brand.toUpperCase();
+      document.getElementById('nav-brand-name').textContent = brand.toUpperCase();
+      document.title = `${brand} | Gestión de Equipo & Convención`;
+
+      // Fecha por defecto en formulario de reporte
+      const fechaInput = document.getElementById('rep-fecha');
+      if (fechaInput) fechaInput.value = new Date().toISOString().split('T')[0];
+
+      // Cargar caché local primero para rapidez instantánea
+      loadCache();
+      updateConnectionIndicator();
+
+      // Si hay URL conectada, sincronizar con Google Sheets
+      if (getScriptUrl()) {
+        await syncWithSheets(false);
+      }
+
+      // Restaurar sesión previa si existe
+      const savedSession = localStorage.getItem('elite_active_session');
+      if (savedSession) {
+        try {
+          const parsed = JSON.parse(savedSession);
+          if (parsed.role === 'admin') {
+            enterAdminView(true);
+          } else if (parsed.role === 'advisor' && parsed.phone) {
+            const adv = appState.asesores.find(a => cleanPhone(a.phone) === cleanPhone(parsed.phone));
+            if (adv) enterAdvisorView(adv, true);
+          }
+        } catch (e) {}
+      }
+
+      lucide.createIcons();
+    });
+
+    function loadCache() {
+      try {
+        const a = localStorage.getItem('elite_cache_asesores');
+        const r = localStorage.getItem('elite_cache_reportes');
+        appState.asesores = a ? JSON.parse(a) : [];
+        appState.reportes = r ? JSON.parse(r) : [];
+      } catch (e) {
+        appState.asesores = [];
+        appState.reportes = [];
+      }
+    }
+
+    function saveCache() {
+      localStorage.setItem('elite_cache_asesores', JSON.stringify(appState.asesores));
+      localStorage.setItem('elite_cache_reportes', JSON.stringify(appState.reportes));
+    }
+
+    function cleanPhone(p) {
+      return String(p || '').replace(/\D/g, '').slice(-10);
+    }
+
+    function formatCOP(val) {
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+      }).format(Number(val) || 0);
+    }
+
+    function getInitials(name) {
+      return String(name || 'AS').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    }
+
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      const styles = {
+        success: 'bg-navy-900 text-white border-emerald-500',
+        warning: 'bg-amber-500 text-navy-950 border-amber-700',
+        error: 'bg-rose-600 text-white border-rose-800'
+      };
+      el.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl border-l-4 text-xs font-semibold transition-all duration-300 ${styles[type] || styles.success}`;
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-8px)';
+        setTimeout(() => el.remove(), 300);
+      }, 3500);
+    }
+
+    function updateConnectionIndicator() {
+      const url = getScriptUrl();
+      const pill = document.getElementById('connection-status-pill');
+      if (!pill) return;
+      if (url) {
+        pill.className = 'flex items-center gap-2 font-semibold text-emerald-700';
+        pill.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span><span>Conectado a Google Sheets</span>`;
+      } else {
+        pill.className = 'flex items-center gap-2 font-semibold text-amber-700';
+        pill.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span>Modo Local (Falta configurar URL de Google Sheets)</span>`;
+      }
+    }
+
+    // =========================================================================
+    // COMUNICACIÓN CON GOOGLE APPS SCRIPT (CORS-SAFE CON text/plain)
+    // =========================================================================
+    async function apiCall(payload) {
+      const url = getScriptUrl();
+      if (!url) return null;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const text = await response.text();
+      return JSON.parse(text);
+    }
+
+    async function syncWithSheets(notify = true) {
+      const spinner = document.getElementById('sync-spinner');
+      if (spinner) spinner.classList.add('animate-spin');
+
+      const url = getScriptUrl();
+      if (!url) {
+        if (spinner) spinner.classList.remove('animate-spin');
+        if (notify) showToast('Trabajando en Modo Local. Configura la URL de Google Sheets para sincronizar en la nube.', 'warning');
+        return;
+      }
+
+      try {
+        const res = await apiCall({ action: 'sync' });
+        if (res && res.status === 'ok' && res.data) {
+          appState.asesores = Array.isArray(res.data.asesores) ? res.data.asesores : [];
+          appState.reportes = Array.isArray(res.data.reportes) ? res.data.reportes.reverse() : [];
+          saveCache();
+
+          if (appState.session) {
+            if (appState.session.role === 'admin') {
+              renderAdminDashboard();
+            } else {
+              const updatedMe = appState.asesores.find(a => cleanPhone(a.phone) === cleanPhone(appState.session.phone));
+              if (updatedMe) renderAdvisorDashboard(updatedMe);
+            }
+          }
+          if (notify) showToast('Datos sincronizados con Google Sheets.');
+        }
+      } catch (err) {
+        console.error('Error sincronizando:', err);
+        if (notify) showToast('Error de conexión con Google Sheets. Verifica que el script esté publicado para "Cualquier persona".', 'error');
+      } finally {
+        if (spinner) spinner.classList.remove('animate-spin');
+      }
+    }
+
+    // =========================================================================
+    // PESTAÑAS Y AUTENTICACIÓN EN PANTALLA DE INICIO
+    // =========================================================================
+    function switchLoginTab(tab) {
+      const tabAdv = document.getElementById('login-tab-advisor');
+      const tabAdm = document.getElementById('login-tab-admin');
+      const panelAdv = document.getElementById('advisor-login-panel');
+      const panelAdm = document.getElementById('admin-login-panel');
+
+      if (tab === 'advisor') {
+        tabAdv.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-display font-bold transition flex items-center justify-center gap-2 bg-white text-navy-900 shadow-sm';
+        tabAdm.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-display font-bold transition flex items-center justify-center gap-2 text-slate-500 hover:text-navy-900';
+        panelAdv.classList.remove('hidden');
+        panelAdm.classList.add('hidden');
+      } else {
+        tabAdm.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-display font-bold transition flex items-center justify-center gap-2 bg-white text-navy-900 shadow-sm';
+        tabAdv.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-display font-bold transition flex items-center justify-center gap-2 text-slate-500 hover:text-navy-900';
+        panelAdm.classList.remove('hidden');
+        panelAdv.classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    async function handleAdvisorPhoneCheck(e) {
+      e.preventDefault();
+      const raw = document.getElementById('advisor-phone-input').value;
+      const phone = cleanPhone(raw);
+
+      if (phone.length < 10) {
+        showToast('Por favor escribe tu número celular completo de 10 dígitos.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btn-advisor-continue');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Verificando...</span>';
+
+      try {
+        // Si hay Google Sheets conectado, consultar lista fresca antes de decidir
+        if (getScriptUrl()) {
+          await syncWithSheets(false);
+        }
+
+        const existing = appState.asesores.find(a => cleanPhone(a.phone) === phone);
+        if (existing) {
+          enterAdvisorView(existing);
+        } else {
+          // Mostrar formulario de Auto-Registro rápido
+          appState.pendingPhone = phone;
+          document.getElementById('reg-phone-display').textContent = phone;
+          document.getElementById('advisor-phone-form').classList.add('hidden');
+          document.getElementById('advisor-register-form').classList.remove('hidden');
+          document.getElementById('reg-name-input').focus();
+          lucide.createIcons();
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Continuar</span><i data-lucide="arrow-right" class="w-5 h-5"></i>';
+        lucide.createIcons();
+      }
+    }
+
+    function cancelAutoRegister() {
+      appState.pendingPhone = '';
+      document.getElementById('advisor-register-form').classList.add('hidden');
+      document.getElementById('advisor-phone-form').classList.remove('hidden');
+    }
+
+    async function handleAdvisorAutoRegister(e) {
+      e.preventDefault();
+      const phone = appState.pendingPhone;
+      const rawName = document.getElementById('reg-name-input').value.trim();
+      const city = document.getElementById('reg-city-input').value.trim();
+
+      if (!rawName) {
+        showToast('Escribe tu nombre completo para registrarte.', 'warning');
+        return;
+      }
+
+      const fullName = city ? `${rawName} (${city})` : rawName;
+      const btn = document.getElementById('btn-advisor-register');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Registrando...</span>';
+
+      const newAdvisor = {
+        phone,
+        name: fullName,
+        metaMensual: Number(CONFIG.DEFAULT_META_MENSUAL) || 15000000,
+        metaConvencion: Number(CONFIG.DEFAULT_META_CONVENCION) || 120000000
+      };
+
+      try {
+        if (getScriptUrl()) {
+          const res = await apiCall({
+            action: 'register_advisor',
+            phone: newAdvisor.phone,
+            name: newAdvisor.name,
+            metaMensual: newAdvisor.metaMensual,
+            metaConvencion: newAdvisor.metaConvencion
+          });
+          if (res && res.status === 'ok' && res.data) {
+            appState.asesores = res.data.asesores || [];
+            appState.reportes = (res.data.reportes || []).reverse();
+            saveCache();
+          }
+        } else {
+          appState.asesores.push(newAdvisor);
+          saveCache();
+        }
+
+        const created = appState.asesores.find(a => cleanPhone(a.phone) === phone) || newAdvisor;
+        cancelAutoRegister();
+        document.getElementById('reg-name-input').value = '';
+        document.getElementById('reg-city-input').value = '';
+        enterAdvisorView(created);
+        showToast('¡Registro completado! Bienvenido a la plataforma.');
+      } catch (err) {
+        showToast('No se pudo registrar en Google Sheets. Verifica tu conexión.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Crear Perfil e Ingresar</span><i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400"></i>';
+        lucide.createIcons();
+      }
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('admin-user-input').value.trim();
+      const pass = document.getElementById('admin-pass-input').value.trim();
+
+      if (user === String(CONFIG.ADMIN_USER) && pass === String(CONFIG.ADMIN_PASS)) {
+        document.getElementById('admin-user-input').value = '';
+        document.getElementById('admin-pass-input').value = '';
+        enterAdminView();
+      } else {
+        showToast('Usuario o contraseña de administrador incorrectos.', 'error');
+      }
+    }
+
+    function enterAdvisorView(advisor, silent = false) {
+      appState.session = { role: 'advisor', phone: advisor.phone, name: advisor.name };
+      localStorage.setItem('elite_active_session', JSON.stringify(appState.session));
+
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('app-view').classList.remove('hidden');
+      document.getElementById('app-view').classList.add('flex');
+
+      document.getElementById('admin-dashboard').classList.add('hidden');
+      document.getElementById('advisor-dashboard').classList.remove('hidden');
+      document.getElementById('btn-nav-config').classList.add('hidden');
+
+      const badge = document.getElementById('nav-role-badge');
+      badge.textContent = 'ASESOR COMERCIAL';
+      badge.className = 'text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30';
+
+      document.getElementById('nav-user-name').textContent = advisor.name;
+      document.getElementById('nav-user-phone').textContent = advisor.phone;
+
+      renderAdvisorDashboard(advisor);
+      lucide.createIcons();
+      if (!silent) showToast(`¡Bienvenido(a), ${advisor.name}!`);
+    }
+
+    function enterAdminView(silent = false) {
+      appState.session = { role: 'admin', name: 'Dirección Comercial' };
+      localStorage.setItem('elite_active_session', JSON.stringify(appState.session));
+
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('app-view').classList.remove('hidden');
+      document.getElementById('app-view').classList.add('flex');
+
+      document.getElementById('advisor-dashboard').classList.add('hidden');
+      document.getElementById('admin-dashboard').classList.remove('hidden');
+      document.getElementById('btn-nav-config').classList.remove('hidden');
+      document.getElementById('btn-nav-config').classList.add('inline-flex');
+
+      const badge = document.getElementById('nav-role-badge');
+      badge.textContent = 'DIRECCIÓN / ADMIN';
+      badge.className = 'text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-amber-500 text-navy-950';
+
+      document.getElementById('nav-user-name').textContent = 'Administrador';
+      document.getElementById('nav-user-phone').textContent = CONFIG.ADMIN_USER;
+
+      renderAdminDashboard();
+      lucide.createIcons();
+      if (!silent) showToast('Acceso concedido al Tablero Directivo.');
+    }
+
+    function logout() {
+      appState.session = null;
+      localStorage.removeItem('elite_active_session');
+      document.getElementById('app-view').classList.add('hidden');
+      document.getElementById('app-view').classList.remove('flex');
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('advisor-phone-input').value = '';
+      cancelAutoRegister();
+    }
+
+    // =========================================================================
+    // CÁLCULO DE ESTADÍSTICAS DEL EQUIPO
+    // =========================================================================
+    function computeTeamMetrics() {
+      const currentMonthPrefix = new Date().toISOString().slice(0, 7); // YYYY-MM
+
+      const list = appState.asesores.map(adv => {
+        const phone = cleanPhone(adv.phone);
+        const myReports = appState.reportes.filter(r => cleanPhone(r.phone) === phone);
+
+        // Producción del mes actual (si no hay fecha del mes, suma todo si es campaña vigente, pero filtramos mes actual + acumulado total)
+        const monthReports = myReports.filter(r => String(r.fecha || '').startsWith(currentMonthPrefix));
+        const activeMonthReports = monthReports.length > 0 ? monthReports : myReports;
+
+        const monthSales = activeMonthReports.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+        const monthPolizas = activeMonthReports.reduce((acc, r) => acc + (Number(r.polizas) || 1), 0);
+
+        // Acumulado total para Convención
+        const totalConvSales = myReports.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+
+        const metaMensual = Number(adv.metaMensual) || CONFIG.DEFAULT_META_MENSUAL;
+        const metaConvencion = Number(adv.metaConvencion) || CONFIG.DEFAULT_META_CONVENCION;
+
+        const monthPct = metaMensual > 0 ? Math.round((monthSales / metaMensual) * 100) : 0;
+        const convPct = metaConvencion > 0 ? Math.round((totalConvSales / metaConvencion) * 100) : 0;
+
+        return {
+          ...adv,
+          phone,
+          myReports,
+          monthSales,
+          monthPolizas,
+          totalConvSales,
+          metaMensual,
+          metaConvencion,
+          monthPct,
+          convPct
+        };
+      });
+
+      list.sort((a, b) => b.monthSales - a.monthSales);
+      list.forEach((item, index) => { item.rank = index + 1; });
+      return list;
+    }
+
+    // =========================================================================
+    // RENDERIZADO PANEL DE ASESOR COMERCIAL
+    // =========================================================================
+    function renderAdvisorDashboard(advisorObj) {
+      const team = computeTeamMetrics();
+      const me = team.find(a => cleanPhone(a.phone) === cleanPhone(advisorObj.phone));
+      if (!me) return;
+
+      document.getElementById('adv-welcome-name').textContent = me.name.split(' ')[0];
+
+      // KPIs
+      document.getElementById('adv-kpi-sales').textContent = formatCOP(me.monthSales);
+      document.getElementById('adv-kpi-goal').textContent = formatCOP(me.metaMensual);
+      document.getElementById('adv-kpi-month-pct').textContent = `${me.monthPct}%`;
+      document.getElementById('adv-kpi-month-bar').style.width = `${Math.min(me.monthPct, 100)}%`;
+      document.getElementById('adv-kpi-polizas').textContent = me.monthPolizas;
+      document.getElementById('adv-kpi-rank').innerHTML = `#${me.rank} <span class="text-sm font-normal text-slate-400">de ${team.length}</span>`;
+
+      // Termómetro Rumbo a Convención
+      const faltante = Math.max(me.metaConvencion - me.totalConvSales, 0);
+      document.getElementById('adv-conv-pct-text').textContent = `${me.convPct}%`;
+      document.getElementById('adv-conv-ratio-text').textContent = `${formatCOP(me.totalConvSales)} / ${formatCOP(me.metaConvencion)}`;
+      document.getElementById('adv-conv-bar').style.width = `${Math.min(me.convPct, 100)}%`;
+
+      const badge = document.getElementById('adv-conv-badge');
+      const subtitle = document.getElementById('adv-conv-subtitle');
+
+      if (me.convPct >= 100) {
+        badge.textContent = '🏆 Clasificado VIP';
+        badge.className = 'text-xs font-extrabold px-3 py-0.5 rounded-full bg-amber-400 text-navy-950 animate-gold-pulse';
+        subtitle.innerHTML = `¡Felicitaciones! Ya aseguraste tu cupo oficial a la Convención.`;
+      } else if (me.convPct >= 70) {
+        badge.textContent = '🔥 En zona de clasificación';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-400 text-navy-950';
+        subtitle.innerHTML = `¡Muy cerca! Te faltan <strong class="text-amber-300">${formatCOP(faltante)}</strong> para asegurar tu cupo.`;
+      } else {
+        badge.textContent = '🚀 Acelerar ritmo';
+        badge.className = 'text-xs font-bold px-2.5 py-0.5 rounded-full bg-white/20 text-amber-300';
+        subtitle.innerHTML = `Te faltan <strong class="text-amber-300">${formatCOP(faltante)}</strong> acumulados para clasificar a la Convención.`;
+      }
+
+      // Historial propio
+      document.getElementById('adv-reports-count').textContent = `${me.myReports.length} cierres`;
+      const listEl = document.getElementById('adv-reports-list');
+
+      if (me.myReports.length === 0) {
+        listEl.innerHTML = `
+          <div class="text-center py-10 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+            <p class="text-sm font-bold text-slate-600">Aún no tienes cierres reportados</p>
+            <p class="text-xs text-slate-400 mt-1">Registra tu primer negocio en el formulario de la izquierda.</p>
+          </div>`;
+      } else {
+        listEl.innerHTML = me.myReports.map(r => `
+          <div class="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl bg-navy-900 text-amber-400 font-display font-bold text-xs flex items-center justify-center shrink-0">
+                ${String(r.ramo || 'OTR').slice(0, 3).toUpperCase()}
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h4 class="font-bold text-sm text-navy-900">${r.cliente}</h4>
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-blue-100 text-blue-800">${r.ramo}</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">Fecha: ${r.fecha} • ${r.polizas || 1} póliza(s)</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between sm:justify-end gap-3 pl-13 sm:pl-0">
+              <p class="font-display font-extrabold text-base text-emerald-700">${formatCOP(r.valor)}</p>
+              <button onclick="handleDeleteReport('${r.id}')" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Eliminar registro">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      lucide.createIcons();
+    }
+
+    async function handleAddReport(e) {
+      e.preventDefault();
+      if (!appState.session || appState.session.role !== 'advisor') return;
+
+      const cliente = document.getElementById('rep-cliente').value.trim();
+      const ramo = document.getElementById('rep-ramo').value;
+      const fecha = document.getElementById('rep-fecha').value;
+      const valor = Number(document.getElementById('rep-valor').value) || 0;
+      const polizas = Number(document.getElementById('rep-polizas').value) || 1;
+
+      if (!cliente || valor <= 0) {
+        showToast('Completa el cliente y un valor válido.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-report');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Guardando...</span>';
+
+      const newReport = {
+        id: 'REP-' + Date.now(),
+        fecha,
+        phone: cleanPhone(appState.session.phone),
+        asesor: appState.session.name,
+        cliente,
+        ramo,
+        valor,
+        polizas
+      };
+
+      try {
+        if (getScriptUrl()) {
+          const res = await apiCall({
+            action: 'add_report',
+            ...newReport
+          });
+          if (res && res.status === 'ok' && res.data) {
+            appState.asesores = res.data.asesores || appState.asesores;
+            appState.reportes = (res.data.reportes || []).reverse();
+            saveCache();
+          }
+        } else {
+          appState.reportes.unshift(newReport);
+          saveCache();
+        }
+
+        document.getElementById('rep-cliente').value = '';
+        document.getElementById('rep-valor').value = '';
+        document.getElementById('rep-polizas').value = '1';
+
+        const me = appState.asesores.find(a => cleanPhone(a.phone) === cleanPhone(appState.session.phone));
+        if (me) renderAdvisorDashboard(me);
+        showToast(`¡Cierre por ${formatCOP(valor)} registrado!`);
+      } catch (err) {
+        showToast('Error al guardar en Google Sheets. Revisa tu conexión.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i><span>Guardar Cierre y Sumar a Meta</span>';
+        lucide.createIcons();
+      }
+    }
+
+    async function handleDeleteReport(reportId) {
+      try {
+        if (getScriptUrl()) {
+          const res = await apiCall({ action: 'delete_report', id: reportId });
+          if (res && res.status === 'ok' && res.data) {
+            appState.asesores = res.data.asesores || appState.asesores;
+            appState.reportes = (res.data.reportes || []).reverse();
+            saveCache();
+          }
+        } else {
+          appState.reportes = appState.reportes.filter(r => String(r.id) !== String(reportId));
+          saveCache();
+        }
+
+        if (appState.session.role === 'advisor') {
+          const me = appState.asesores.find(a => cleanPhone(a.phone) === cleanPhone(appState.session.phone));
+          if (me) renderAdvisorDashboard(me);
+        } else {
+          renderAdminDashboard();
+        }
+        showToast('Registro eliminado.');
+      } catch (err) {
+        showToast('No se pudo eliminar el registro.', 'error');
+      }
+    }
+
+    function shareAdvisorWhatsApp() {
+      const team = computeTeamMetrics();
+      const me = team.find(a => cleanPhone(a.phone) === cleanPhone(appState.session.phone));
+      if (!me) return;
+
+      const text =
+        `📊 *Avance Comercial - ${me.name}*\n` +
+        `💰 Producción Mes: *${formatCOP(me.monthSales)}* (${me.monthPct}% de meta)\n` +
+        `🏆 Rumbo a Convención: *${me.convPct}%* (${formatCOP(me.totalConvSales)} / ${formatCOP(me.metaConvencion)})\n` +
+        `📑 Pólizas cerradas: *${me.monthPolizas}*\n` +
+        `🥇 Ranking Equipo: *#${me.rank} de ${team.length}*`;
+
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // =========================================================================
+    // RENDERIZADO PANEL ADMINISTRADOR / DIRECCIÓN COMERCIAL
+    // =========================================================================
+    function switchAdminTab(tab) {
+      ['ranking', 'advisors', 'reports'].forEach(t => {
+        document.getElementById(`adm-panel-${t}`).classList.add('hidden');
+        document.getElementById(`adm-tab-${t}`).className = 'px-4 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-100';
+      });
+      document.getElementById(`adm-panel-${tab}`).classList.remove('hidden');
+      document.getElementById(`adm-tab-${tab}`).className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-navy-900 text-white shadow';
+      lucide.createIcons();
+    }
+
+    function renderAdminDashboard() {
+      const team = computeTeamMetrics();
+      document.getElementById('adm-team-count').textContent = `${team.length} asesor(es)`;
+
+      const totalSales = team.reduce((s, a) => s + a.monthSales, 0);
+      const totalGoal = team.reduce((s, a) => s + a.metaMensual, 0);
+      const globalPct = totalGoal > 0 ? Math.round((totalSales / totalGoal) * 100) : 0;
+      const totalPolizas = team.reduce((s, a) => s + a.monthPolizas, 0);
+      const qualifiedVip = team.filter(a => a.convPct >= 100).length;
+      const zoneClass = team.filter(a => a.convPct >= 70 && a.convPct < 100).length;
+
+      document.getElementById('adm-kpi-sales').textContent = formatCOP(totalSales);
+      document.getElementById('adm-kpi-goal').textContent = formatCOP(totalGoal);
+      document.getElementById('adm-kpi-pct').textContent = `${globalPct}%`;
+      document.getElementById('adm-kpi-pct-bar').style.width = `${Math.min(globalPct, 100)}%`;
+      document.getElementById('adm-kpi-polizas').textContent = totalPolizas;
+      document.getElementById('adm-kpi-reports-count').textContent = appState.reportes.length;
+      document.getElementById('adm-kpi-qualified').textContent = qualifiedVip;
+      document.getElementById('adm-kpi-zone').textContent = zoneClass;
+
+      // Tabla de Ranking
+      const tbody = document.getElementById('adm-ranking-tbody');
+      if (team.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-sm text-slate-500">Aún no hay asesores registrados. Cuando ingresen con su celular o los agregues aquí, aparecerán en vivo.</td></tr>`;
+      } else {
+        tbody.innerHTML = team.map(a => {
+          let posBadge = `<span class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 font-bold text-xs inline-flex items-center justify-center">${a.rank}</span>`;
+          if (a.rank === 1) posBadge = `<span class="w-7 h-7 rounded-full gold-gradient text-white font-bold text-xs inline-flex items-center justify-center shadow">1</span>`;
+          if (a.rank === 2) posBadge = `<span class="w-7 h-7 rounded-full bg-slate-300 text-navy-900 font-bold text-xs inline-flex items-center justify-center">2</span>`;
+          if (a.rank === 3) posBadge = `<span class="w-7 h-7 rounded-full bg-amber-700/80 text-white font-bold text-xs inline-flex items-center justify-center">3</span>`;
+
+          let statusPill = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Acelerar ritmo</span>`;
+          if (a.convPct >= 100) statusPill = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">🏆 Clasificado VIP</span>`;
+          else if (a.convPct >= 70) statusPill = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">🔥 En zona</span>`;
+
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-3.5 px-4">${posBadge}</td>
+              <td class="py-3.5 px-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-navy-900 text-white font-display font-bold text-xs flex items-center justify-center shrink-0">
+                    ${getInitials(a.name)}
+                  </div>
+                  <div>
+                    <p class="font-bold text-navy-900 text-sm">${a.name}</p>
+                    <p class="text-[11px] text-slate-400 font-mono">${a.phone} • ${a.monthPolizas} pólizas</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3.5 px-4 text-right font-display font-extrabold text-navy-900">${formatCOP(a.monthSales)}</td>
+              <td class="py-3.5 px-4">
+                <div class="w-32">
+                  <div class="flex justify-between text-xs font-bold mb-1">
+                    <span>${a.monthPct}%</span>
+                    <span class="text-[10px] text-slate-400">${formatCOP(a.metaMensual)}</span>
+                  </div>
+                  <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-emerald-500 rounded-full" style="width: ${Math.min(a.monthPct, 100)}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3.5 px-4">
+                <div class="w-36">
+                  <div class="flex justify-between text-xs font-bold mb-1">
+                    <span class="text-amber-700">${a.convPct}%</span>
+                    <span class="text-[10px] text-slate-400">${formatCOP(a.metaConvencion)}</span>
+                  </div>
+                  <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full gold-gradient rounded-full" style="width: ${Math.min(a.convPct, 100)}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3.5 px-4 text-center">${statusPill}</td>
+              <td class="py-3.5 px-4 text-right">
+                <button onclick="openAdvisorModal('${a.phone}')" class="p-2 rounded-xl hover:bg-slate-200/70 text-slate-600 transition" title="Editar metas">
+                  <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Tarjetas de Equipo
+      const grid = document.getElementById('adm-advisors-grid');
+      grid.innerHTML = team.map(a => `
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between gap-3">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-navy-900 text-white font-display font-bold text-xs flex items-center justify-center">
+                ${getInitials(a.name)}
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-navy-900">${a.name}</h4>
+                <p class="text-xs font-mono text-slate-500">${a.phone}</p>
+              </div>
+            </div>
+            <button onclick="openAdvisorModal('${a.phone}')" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold text-navy-900 shadow-sm">
+              Editar Metas
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/70 text-xs">
+            <div>
+              <span class="text-slate-400 block text-[11px]">Meta Mensual</span>
+              <strong class="text-navy-900">${formatCOP(a.metaMensual)}</strong>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px]">Meta Convención</span>
+              <strong class="text-amber-700">${formatCOP(a.metaConvencion)}</strong>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Poblar filtro de asesores en bitácora
+      const selAdv = document.getElementById('filter-report-advisor');
+      const prevVal = selAdv.value;
+      selAdv.innerHTML = '<option value="all">Todos los asesores</option>';
+      team.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.phone;
+        opt.textContent = a.name;
+        selAdv.appendChild(opt);
+      });
+      if ([...selAdv.options].some(o => o.value === prevVal)) selAdv.value = prevVal;
+
+      renderAdminReportsList();
+      renderAdminCharts(team);
+      lucide.createIcons();
+    }
+
+    function renderAdminReportsList() {
+      const filterAdv = document.getElementById('filter-report-advisor').value;
+      const filterRamo = document.getElementById('filter-report-ramo').value;
+      const listEl = document.getElementById('adm-reports-list');
+
+      const filtered = appState.reportes.filter(r => {
+        if (filterAdv !== 'all' && cleanPhone(r.phone) !== cleanPhone(filterAdv)) return false;
+        if (filterRamo !== 'all' && r.ramo !== filterRamo) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<p class="text-sm text-slate-500 text-center py-8">No hay cierres que coincidan con el filtro seleccionado.</p>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(r => `
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 font-display font-bold text-xs flex items-center justify-center shrink-0">
+              ${getInitials(r.asesor)}
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-bold text-sm text-navy-900">${r.asesor}</span>
+                <span class="text-xs text-slate-400">&rarr;</span>
+                <span class="font-semibold text-sm text-slate-800">${r.cliente}</span>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-navy-900/10 text-navy-900">${r.ramo}</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Fecha: ${r.fecha} • Cel: ${r.phone} • ${r.polizas || 1} póliza(s)</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between sm:justify-end gap-3">
+            <p class="font-display font-extrabold text-base text-emerald-700">${formatCOP(r.valor)}</p>
+            <button onclick="handleDeleteReport('${r.id}')" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Eliminar cierre">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function renderAdminCharts(team) {
+      const ctxBar = document.getElementById('adminSalesBarChart');
+      const ctxRamo = document.getElementById('adminRamoChart');
+      if (!ctxBar || !ctxRamo) return;
+
+      if (appState.salesChart) appState.salesChart.destroy();
+      if (appState.ramoChart) appState.ramoChart.destroy();
+
+      const labels = team.map(a => a.name.split(' ')[0] + ' ' + (a.name.split(' ')[1]?.[0] || '') + '.');
+      const salesData = team.map(a => Math.round((a.monthSales / 1000000) * 10) / 10);
+      const goalsData = team.map(a => Math.round((a.metaMensual / 1000000) * 10) / 10);
+
+      appState.salesChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Ventas Reales ($M)', data: salesData, backgroundColor: '#059669', borderRadius: 6 },
+            { label: 'Meta Mensual ($M)', data: goalsData, backgroundColor: '#CBD5E1', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 } } } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+          }
+        }
+      });
+
+      const byRamo = {};
+      appState.reportes.forEach(r => {
+        byRamo[r.ramo] = (byRamo[r.ramo] || 0) + (Number(r.valor) || 0);
+      });
+
+      appState.ramoChart = new Chart(ctxRamo, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(byRamo).length ? Object.keys(byRamo) : ['Sin datos'],
+          datasets: [{
+            data: Object.values(byRamo).length ? Object.values(byRamo) : [1],
+            backgroundColor: ['#0B1633', '#059669', '#F59E0B', '#2563EB', '#7C3AED', '#EC4899', '#64748B'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '64%',
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } } }
+        }
+      });
+    }
+
+    // =========================================================================
+    // MODAL EDITAR / AGREGAR ASESOR
+    // =========================================================================
+    function openAdvisorModal(phone = null) {
+      const modal = document.getElementById('advisor-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      const phoneInput = document.getElementById('modal-adv-phone');
+      if (phone) {
+        const adv = appState.asesores.find(a => cleanPhone(a.phone) === cleanPhone(phone));
+        document.getElementById('advisor-modal-title').textContent = 'Editar Asesor y Metas';
+        document.getElementById('modal-adv-is-edit').value = '1';
+        phoneInput.value = adv.phone;
+        phoneInput.readOnly = true;
+        phoneInput.classList.add('opacity-70');
+        document.getElementById('modal-adv-name').value = adv.name;
+        document.getElementById('modal-adv-meta-mensual').value = adv.metaMensual;
+        document.getElementById('modal-adv-meta-conv').value = adv.metaConvencion;
+      } else {
+        document.getElementById('advisor-modal-title').textContent = 'Agregar Nuevo Asesor';
+        document.getElementById('modal-adv-is-edit').value = '0';
+        phoneInput.value = '';
+        phoneInput.readOnly = false;
+        phoneInput.classList.remove('opacity-70');
+        document.getElementById('modal-adv-name').value = '';
+        document.getElementById('modal-adv-meta-mensual').value = CONFIG.DEFAULT_META_MENSUAL;
+        document.getElementById('modal-adv-meta-conv').value = CONFIG.DEFAULT_META_CONVENCION;
+      }
+      lucide.createIcons();
+    }
+
+    function closeAdvisorModal() {
+      const modal = document.getElementById('advisor-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function handleSaveAdvisorModal(e) {
+      e.preventDefault();
+      const isEdit = document.getElementById('modal-adv-is-edit').value === '1';
+      const phone = cleanPhone(document.getElementById('modal-adv-phone').value);
+      const name = document.getElementById('modal-adv-name').value.trim();
+      const metaMensual = Number(document.getElementById('modal-adv-meta-mensual').value) || CONFIG.DEFAULT_META_MENSUAL;
+      const metaConvencion = Number(document.getElementById('modal-adv-meta-conv').value) || CONFIG.DEFAULT_META_CONVENCION;
+
+      if (phone.length < 10) {
+        showToast('Ingresa un número celular válido de 10 dígitos.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btn-save-advisor-modal');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      try {
+        if (getScriptUrl()) {
+          const res = await apiCall({
+            action: isEdit ? 'update_advisor' : 'register_advisor',
+            phone,
+            name,
+            metaMensual,
+            metaConvencion
+          });
+          if (res && res.status === 'ok' && res.data) {
+            appState.asesores = res.data.asesores || [];
+            appState.reportes = (res.data.reportes || []).reverse();
+            saveCache();
+          }
+        } else {
+          const idx = appState.asesores.findIndex(a => cleanPhone(a.phone) === phone);
+          const obj = { phone, name, metaMensual, metaConvencion };
+          if (idx >= 0) appState.asesores[idx] = obj;
+          else appState.asesores.push(obj);
+          saveCache();
+        }
+
+        closeAdvisorModal();
+        renderAdminDashboard();
+        showToast(`Metas y datos de ${name} guardados.`);
+      } catch (err) {
+        showToast('Error guardando datos en Google Sheets.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Guardar en la Nube';
+      }
+    }
+
+    // =========================================================================
+    // MODAL CONFIGURACIÓN GOOGLE SHEETS & EXPORTAR CSV
+    // =========================================================================
+    function openSheetsModal() {
+      const modal = document.getElementById('sheets-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.getElementById('modal-sheets-url-input').value = getScriptUrl();
+      lucide.createIcons();
+    }
+
+    function closeSheetsModal() {
+      const modal = document.getElementById('sheets-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveTempSheetsUrl() {
+      const url = document.getElementById('modal-sheets-url-input').value.trim();
+      localStorage.setItem('elite_temp_sheets_url', url);
+      updateConnectionIndicator();
+      if (url) {
+        await syncWithSheets(true);
+      } else {
+        showToast('URL temporal borrada.', 'warning');
+      }
+    }
+
+    function copyAppsScriptCode() {
+      const code = document.getElementById('apps-script-template').textContent;
+      const ta = document.createElement('textarea');
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Código Google Apps Script copiado al portapapeles.');
+    }
+
+    function exportReportsCSV() {
+      const headers = ['ID', 'Fecha', 'Telefono', 'Asesor', 'Cliente', 'Ramo', 'Valor COP', 'Polizas'];
+      const rows = appState.reportes.map(r => [
+        r.id,
+        r.fecha,
+        r.phone,
+        `"${String(r.asesor || '').replace(/"/g, '""')}"`,
+        `"${String(r.cliente || '').replace(/"/g, '""')}"`,
+        r.ramo,
+        r.valor,
+        r.polizas || 1
+      ]);
+      const csv = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Consolidado_Comercial_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('Archivo Excel (CSV) descargado.');
+    }
+  </script>
+</body>
+</html>
