@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Élite Comercial | Gestión de Equipo & Convención</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .navy-gradient { background: linear-gradient(135deg, #090d16 0%, #0f172a 55%, #1e293b 100%); }
+    .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .card-shadow { box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06); }
+    .tab-active { background-color: #0f172a; color: #ffffff; }
+    .tab-inactive { color: #64748b; }
+    .tab-inactive:hover { color: #0f172a; background-color: #f1f5f9; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-white">
+
+  <!-- CONTENEDOR DE NOTIFICACIONES TOAST -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- ========================================================= -->
+  <!-- 1. CONFIGURACIÓN PRINCIPAL (YA CONECTADO A TU GOOGLE SHEET)-->
+  <!-- ========================================================= -->
+  <script>
+    const CONFIG = {
+      // 1. Tu URL real de Google Apps Script ya está conectada:
+      GOOGLE_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxXV8cXWRzBG2qMYsf1-RdCD56KTJ6nTxSSo7VkBBXl90WzrUYbbF9F3VyuJHWSYvtFfw/exec",
+
+      // 2. Usuario y contraseña del Director / Administrador:
+      ADMIN_USER: "admin",
+      ADMIN_PASS: "2026",
+
+      // 3. Metas por defecto (en cantidad de ventas/unidades):
+      DEFAULT_META_MENSUAL: 5,
+      DEFAULT_META_CONVENCION: 45,
+      META_BONO_TRIMESTRAL: 11, // >= 11 ventas en el trimestre califica a bono
+
+      // 4. Nombre de tu agencia o equipo comercial:
+      COMPANY_NAME: "Élite Comercial"
+    };
+  </script>
+
+  <!-- ========================================================= -->
+  <!-- PANTALLA 1: INICIO DE SESIÓN (ASESOR / DIRECTOR)          -->
+  <!-- ========================================================= -->
+  <div id="login-view" class="min-h-screen navy-gradient flex flex-col justify-between p-4 sm:p-6 relative overflow-hidden">
+    <div class="absolute -top-24 -right-24 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -left-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Header superior -->
+    <header class="max-w-5xl w-full mx-auto flex items-center justify-between z-10">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center shadow-lg shadow-amber-500/20">
+          <i data-lucide="trophy" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <span id="login-brand-name" class="text-white font-display font-bold text-lg tracking-tight block leading-none">ÉLITE COMERCIAL</span>
+          <span class="text-amber-400 text-[11px] font-medium tracking-wider uppercase">Metas, Bonos & Convención</span>
+        </div>
+      </div>
+
+      <button onclick="openSheetsModal()" title="Configurar conexión Google Sheets" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition border border-white/10">
+        <i data-lucide="settings" class="w-4 h-4 text-amber-400"></i>
+        <span class="hidden sm:inline">Configurar</span>
+      </button>
+    </header>
+
+    <!-- Tarjeta Central de Acceso -->
+    <main class="max-w-md w-full mx-auto my-auto z-10 py-6">
+      <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+        <!-- Selector de Rol -->
+        <div class="grid grid-cols-2 bg-slate-100 p-1.5 m-4 rounded-2xl">
+          <button id="role-btn-advisor" onclick="switchLoginRole('advisor')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 bg-white text-slate-900 shadow-sm">
+            <i data-lucide="smartphone" class="w-4 h-4 text-emerald-600"></i>
+            Asesor Comercial
+          </button>
+          <button id="role-btn-admin" onclick="switchLoginRole('admin')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800">
+            <i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i>
+            Director / Admin
+          </button>
+        </div>
+
+        <!-- Formulario Asesor -->
+        <div id="login-advisor-panel" class="px-6 pb-7 pt-2">
+          <div class="text-center mb-6">
+            <h1 class="font-display font-bold text-xl text-slate-900">Portal del Asesor</h1>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">Ingresa tu número celular para reportar ventas o revisar tu bono trimestral.</p>
+          </div>
+
+          <!-- Paso 1: Celular -->
+          <form id="advisor-phone-form" onsubmit="handleAdvisorPhoneSubmit(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Número de Celular (10 dígitos)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-medium text-sm">+57</span>
+                <input type="tel" id="advisor-phone-input" required maxlength="10" placeholder="Ej. 3001234567" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-semibold text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition" />
+              </div>
+            </div>
+            <button type="submit" id="advisor-continue-btn" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2">
+              <span>Continuar</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </form>
+
+          <!-- Paso 2: Registro rápido si es nuevo -->
+          <form id="advisor-register-form" onsubmit="handleAdvisorRegisterSubmit(event)" class="space-y-4 hidden">
+            <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-start gap-2.5">
+              <i data-lucide="sparkles" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+              <div class="text-xs text-amber-900">
+                <span class="font-bold block">¡Bienvenido al equipo!</span>
+                El número <span id="register-phone-display" class="font-bold underline"></span> aún no está registrado. Crea tu perfil en 5 segundos:
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Tu Nombre Completo</label>
+              <input type="text" id="advisor-name-input" required placeholder="Ej. Carlos Andrés Gómez" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition" />
+            </div>
+            <div class="flex gap-2">
+              <button type="button" onclick="resetAdvisorLogin()" class="px-4 py-3 rounded-2xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition">Atrás</button>
+              <button type="submit" id="advisor-register-btn" class="flex-1 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                <span>Crear Perfil e Ingresar</span>
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Formulario Administrador -->
+        <div id="login-admin-panel" class="px-6 pb-7 pt-2 hidden">
+          <div class="text-center mb-6">
+            <h2 class="font-display font-bold text-xl text-slate-900">Dirección Comercial</h2>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">Acceso al tablero de cumplimiento, gráficas mensuales y bonos trimestrales.</p>
+          </div>
+          <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Usuario</label>
+              <input type="text" id="admin-user-input" required placeholder="admin" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Contraseña</label>
+              <input type="password" id="admin-pass-input" required placeholder="••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition" />
+            </div>
+            <button type="submit" class="w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
+              <i data-lucide="lock" class="w-4 h-4 text-amber-400"></i>
+              <span>Ingresar al Panel Director</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Barra inferior de estado de conexión -->
+        <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <div id="connection-status-badge" class="flex items-center gap-1.5 font-medium text-slate-500">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>Verificando conexión...</span>
+          </div>
+          <button onclick="openSheetsModal()" class="text-slate-600 hover:text-slate-900 font-semibold underline">Conectar</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="max-w-5xl w-full mx-auto text-center text-slate-400 text-xs z-10">
+      Plataforma Comercial en Tiempo Real • Sincronización con Google Sheets
+    </footer>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- PANTALLA 2: APLICACIÓN PRINCIPAL (ASESOR O ADMINISTRADOR) -->
+  <!-- ========================================================= -->
+  <div id="app-view" class="min-h-screen flex flex-col hidden">
+    <!-- Barra de navegación superior -->
+    <nav class="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl gold-gradient flex items-center justify-center">
+            <i data-lucide="trophy" class="w-4 h-4 text-white"></i>
+          </div>
+          <div>
+            <span id="nav-brand-name" class="font-display font-bold text-sm sm:text-base tracking-tight block leading-none">ÉLITE COMERCIAL</span>
+            <span id="nav-user-subtitle" class="text-[11px] text-amber-400 font-medium">Panel de Gestión</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="syncWithSheets(true)" title="Actualizar datos desde Google Sheets" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 transition flex items-center gap-1.5 text-xs font-medium">
+            <i data-lucide="refresh-cw" id="sync-icon" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Sincronizar</span>
+          </button>
+          <button onclick="logout()" class="px-3 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 text-xs font-semibold transition flex items-center gap-1.5">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span>Salir</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ======================================================= -->
+    <!-- VISTA A: PANEL DEL ASESOR COMERCIAL                     -->
+    <!-- ======================================================= -->
+    <div id="advisor-dashboard" class="max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 hidden">
+      <!-- Bienvenida y Estado de Bono Trimestral -->
+      <div class="navy-gradient rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 text-amber-300 text-xs font-semibold mb-2">
+              <i data-lucide="award" class="w-3.5 h-3.5"></i>
+              <span id="adv-quarter-label">Trimestre Actual</span>
+            </span>
+            <h1 class="font-display font-bold text-2xl sm:text-3xl">Hola, <span id="adv-welcome-name">Asesor</span></h1>
+            <p class="text-slate-300 text-xs sm:text-sm mt-1">Línea registrada: <span id="adv-welcome-phone" class="font-semibold text-white"></span></p>
+          </div>
+
+          <!-- Tarjeta de Bono Trimestral (>= 11 ventas) -->
+          <div id="adv-bonus-card" class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 min-w-[260px]">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Bono Trimestral (Meta: 11)</span>
+              <span id="adv-bonus-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300">En progreso</span>
+            </div>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="adv-quarter-sales" class="font-display font-extrabold text-3xl text-white">0</span>
+              <span class="text-xs text-slate-300">/ 11 ventas en el trimestre</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5 mt-2.5 overflow-hidden">
+              <div id="adv-bonus-bar" class="gold-gradient h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p id="adv-bonus-msg" class="text-[11px] text-slate-300 mt-2">Te faltan 11 ventas para activar tu bono trimestral.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs del Asesor -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
+            <span>Ventas del Mes Actual</span>
+            <i data-lucide="calendar" class="w-4 h-4 text-emerald-600"></i>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="adv-month-sales" class="font-display font-extrabold text-3xl text-slate-900">0</span>
+            <span class="text-xs text-slate-500">de <span id="adv-month-target">5</span> meta mes</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-2 mt-3">
+            <div id="adv-month-bar" class="bg-emerald-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
+            <span>Acumulado Convención (Año)</span>
+            <i data-lucide="plane" class="w-4 h-4 text-amber-600"></i>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="adv-year-sales" class="font-display font-extrabold text-3xl text-slate-900">0</span>
+            <span class="text-xs text-slate-500">de <span id="adv-conv-target">45</span> meta anual</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-2 mt-3">
+            <div id="adv-conv-bar" class="bg-amber-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
+            <span>Desglose Usuario vs Familiar</span>
+            <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
+          </div>
+          <div class="mt-3 flex items-center justify-between">
+            <div>
+              <span class="text-xs text-slate-500 block">Individual / Usuario</span>
+              <span id="adv-count-usuario" class="font-display font-bold text-xl text-slate-900">0</span>
+            </div>
+            <div class="h-8 w-px bg-slate-200"></div>
+            <div>
+              <span class="text-xs text-slate-500 block">Plan Familiar</span>
+              <span id="adv-count-familiar" class="font-display font-bold text-xl text-indigo-600">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario de Reporte de Venta (SIN MONTO EN PESOS -> CON TIPO DE VENTA: USUARIO / FAMILIAR) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 card-shadow h-fit">
+          <div class="flex items-center gap-2.5 mb-5">
+            <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+              <i data-lucide="plus-circle" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-display font-bold text-lg text-slate-900">Reportar Nueva Venta</h2>
+              <p class="text-xs text-slate-500">Registra tus cierres efectivos al instante</p>
+            </div>
+          </div>
+
+          <form onsubmit="handleAddReport(event)" class="space-y-4">
+            <!-- Tipo de Venta: Usuario o Familiar -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Tipo de Venta *</label>
+              <div class="grid grid-cols-2 gap-2.5">
+                <label class="cursor-pointer">
+                  <input type="radio" name="tipo-venta" value="Usuario" checked class="peer sr-only" />
+                  <div class="p-3 rounded-xl border-2 border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50/70 transition flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 peer-checked:text-emerald-800">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    <span>Usuario</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="tipo-venta" value="Familiar" class="peer sr-only" />
+                  <div class="p-3 rounded-xl border-2 border-slate-200 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/70 transition flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 peer-checked:text-indigo-800">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span>Familiar</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Nombre del Cliente / Titular *</label>
+              <input type="text" id="rep-cliente" required placeholder="Ej. María Fernanda López" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Producto / Ramo *</label>
+                <select id="rep-ramo" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white">
+                  <option value="Medicina Prepagada">Medicina Prepagada</option>
+                  <option value="Plan Complementario">Plan Complementario</option>
+                  <option value="Póliza de Salud">Póliza de Salud</option>
+                  <option value="Seguro de Vida">Seguro de Vida</option>
+                  <option value="Autos / Todo Riesgo">Autos / Todo Riesgo</option>
+                  <option value="Hogar / Pyme">Hogar / Pyme</option>
+                  <option value="Otro Ramo">Otro Ramo</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Cant. Ventas / Pólizas *</label>
+                <input type="number" id="rep-polizas" required min="1" max="50" value="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Fecha de Cierre *</label>
+              <input type="date" id="rep-fecha" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white" />
+            </div>
+
+            <button type="submit" id="btn-submit-report" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2 text-sm">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span>Guardar Venta en Sistema</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Historial de Ventas del Asesor -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-display font-bold text-lg text-slate-900">Mis Ventas Reportadas</h3>
+              <p class="text-xs text-slate-500">Historial sincronizado con la Dirección Comercial</p>
+            </div>
+            <span id="adv-history-count" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">0 registros</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <th class="py-3 px-2">Fecha</th>
+                  <th class="py-3 px-2">Cliente</th>
+                  <th class="py-3 px-2">Tipo</th>
+                  <th class="py-3 px-2">Producto</th>
+                  <th class="py-3 px-2 text-center">Cant.</th>
+                </tr>
+              </thead>
+              <tbody id="adv-reports-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- VISTA B: PANEL DEL DIRECTOR / ADMINISTRADOR             -->
+    <!-- ======================================================= -->
+    <div id="admin-dashboard" class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 hidden">
+      <!-- Encabezado y Barra de Filtros (Año, Mes y Trimestre) -->
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 card-shadow flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <h1 class="font-display font-bold text-xl sm:text-2xl text-slate-900">Tablero de Dirección Comercial</h1>
+          <p class="text-xs sm:text-sm text-slate-500">Control mensual (Ene–Dic), cumplimiento de equipo y bonos trimestrales (≥ 11 ventas).</p>
+        </div>
+
+        <!-- Filtros Dinámicos -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Filtro Año -->
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+            <i data-lucide="calendar-range" class="w-4 h-4 text-slate-500"></i>
+            <label class="text-xs font-semibold text-slate-500">Año:</label>
+            <select id="filter-year" onchange="renderAdminDashboard()" class="bg-transparent text-xs sm:text-sm font-bold text-slate-900 focus:outline-none">
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+
+          <!-- Filtro Mes (Enero a Diciembre) -->
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+            <i data-lucide="filter" class="w-4 h-4 text-emerald-600"></i>
+            <label class="text-xs font-semibold text-slate-500">Mes:</label>
+            <select id="filter-month" onchange="renderAdminDashboard()" class="bg-transparent text-xs sm:text-sm font-bold text-slate-900 focus:outline-none">
+              <option value="ALL">Todo el Año (Ene - Dic)</option>
+              <option value="01">Enero</option>
+              <option value="02">Febrero</option>
+              <option value="03">Marzo</option>
+              <option value="04">Abril</option>
+              <option value="05">Mayo</option>
+              <option value="06">Junio</option>
+              <option value="07">Julio</option>
+              <option value="08">Agosto</option>
+              <option value="09">Septiembre</option>
+              <option value="10">Octubre</option>
+              <option value="11">Noviembre</option>
+              <option value="12">Diciembre</option>
+            </select>
+          </div>
+
+          <!-- Filtro Trimestre para Bono -->
+          <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+            <i data-lucide="award" class="w-4 h-4 text-amber-600"></i>
+            <label class="text-xs font-semibold text-amber-800">Bono:</label>
+            <select id="filter-quarter" onchange="renderAdminDashboard()" class="bg-transparent text-xs sm:text-sm font-bold text-amber-900 focus:outline-none">
+              <option value="Q1">Q1 (Ene - Mar)</option>
+              <option value="Q2">Q2 (Abr - Jun)</option>
+              <option value="Q3">Q3 (Jul - Sep)</option>
+              <option value="Q4">Q4 (Oct - Dic)</option>
+            </select>
+          </div>
+
+          <!-- Botón Exportar CSV -->
+          <button onclick="exportReportsCSV()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center gap-1.5">
+            <i data-lucide="download" class="w-4 h-4 text-amber-400"></i>
+            <span>Excel / CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs Globales del Periodo Seleccionado -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
+            <span>Total Ventas (Periodo)</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="trending-up" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <p id="kpi-total-ventas" class="font-display font-extrabold text-3xl text-slate-900 mt-2">0</p>
+          <p id="kpi-periodo-desc" class="text-xs text-slate-500 mt-1">Unidades / pólizas cerradas</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
+            <span>Tipo Usuario vs Familiar</span>
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-3">
+            <span class="text-sm font-bold text-emerald-700"><span id="kpi-usuarios-count">0</span> Usuario</span>
+            <span class="text-slate-300">|</span>
+            <span class="text-sm font-bold text-indigo-700"><span id="kpi-familiar-count">0</span> Familiar</span>
+          </div>
+          <p id="kpi-mix-pct" class="text-xs text-slate-500 mt-1.5">Distribución por modalidad</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
+            <span>Calificados Bono Trimestral</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i data-lucide="award" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <p class="font-display font-extrabold text-3xl text-amber-600 mt-2"><span id="kpi-bonus-qualified">0</span> <span class="text-base font-semibold text-slate-400">/ <span id="kpi-total-advisors">0</span></span></p>
+          <p id="kpi-quarter-desc" class="text-xs text-slate-500 mt-1">Asesores con ≥ 11 ventas en Q1</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
+            <span>Líder del Periodo</span>
+            <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-800 flex items-center justify-center">
+              <i data-lucide="crown" class="w-4 h-4 text-amber-500"></i>
+            </div>
+          </div>
+          <p id="kpi-top-advisor" class="font-display font-bold text-lg text-slate-900 mt-2 truncate">Sin registros</p>
+          <p id="kpi-top-advisor-sales" class="text-xs text-emerald-600 font-semibold mt-1">0 ventas cerradas</p>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DE GRÁFICAS PARA EL DIRECTOR -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Gráfica 1: Evolución Mensual Enero - Diciembre -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Movimiento Mensual (Enero – Diciembre)</h2>
+              <p class="text-xs text-slate-500">Ventas totales por mes en el año <span id="chart-year-label" class="font-bold">2026</span></p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold">Histórico Anual</span>
+          </div>
+          <div class="h-64">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfica 2: Cumplimiento por Asesor (vs Meta) -->
+        <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Cumplimiento por Asesor</h2>
+              <p class="text-xs text-slate-500">Ventas en el trimestre seleccionado (Meta Bono: 11)</p>
+            </div>
+            <span id="chart-quarter-badge" class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold">Q1</span>
+          </div>
+          <div class="h-64">
+            <canvas id="advisorComplianceChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfica 3 + Tabla de Bono Trimestral y Ranking de Equipo -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Gráfica 3: Usuario vs Familiar -->
+        <div class="lg:col-span-4 bg-white rounded-3xl p-6 border border-slate-100 card-shadow flex flex-col justify-between">
+          <div>
+            <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Modalidad de Venta</h2>
+            <p class="text-xs text-slate-500">Proporción Usuario Individual vs. Plan Familiar</p>
+          </div>
+          <div class="h-56 my-auto py-2">
+            <canvas id="typeChart"></canvas>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-center text-xs">
+            <div class="p-2 rounded-xl bg-emerald-50/70">
+              <span class="text-slate-500 block">Usuario</span>
+              <span id="chart-legend-usuario" class="font-bold text-emerald-700 text-sm">0</span>
+            </div>
+            <div class="p-2 rounded-xl bg-indigo-50/70">
+              <span class="text-slate-500 block">Familiar</span>
+              <span id="chart-legend-familiar" class="font-bold text-indigo-700 text-sm">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Cumplimiento, Bono Trimestral (≥ 11) y Metas por Asesor -->
+        <div class="lg:col-span-8 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Ranking, Cumplimiento y Bono Trimestral</h2>
+              <p class="text-xs text-slate-500">Regla activa: ≥ 11 ventas en el trimestre califica a Bono Trimestral</p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <th class="py-3 px-2">Asesor</th>
+                  <th class="py-3 px-2 text-center">Periodo</th>
+                  <th class="py-3 px-2 text-center">Usuario / Fam.</th>
+                  <th class="py-3 px-2 text-center">Trimestre (<span id="th-quarter-name">Q1</span>)</th>
+                  <th class="py-3 px-2">Estado Bono (≥11)</th>
+                  <th class="py-3 px-2 text-right">Meta Mes / Año</th>
+                </tr>
+              </thead>
+              <tbody id="admin-ranking-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalle de Movimientos Reportados -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">Detalle de Movimientos del Periodo</h3>
+            <p class="text-xs text-slate-500">Todos los reportes filtrados por año y mes</p>
+          </div>
+          <span id="admin-movements-count" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">0 movimientos</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="py-3 px-2">Fecha</th>
+                <th class="py-3 px-2">Asesor</th>
+                <th class="py-3 px-2">Cliente / Titular</th>
+                <th class="py-3 px-2">Tipo Venta</th>
+                <th class="py-3 px-2">Producto</th>
+                <th class="py-3 px-2 text-center">Ventas</th>
+                <th class="py-3 px-2 text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="admin-reports-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR METAS DE ASESOR -->
+  <div id="edit-advisor-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display font-bold text-lg text-slate-900">Editar Metas del Asesor</h3>
+        <button onclick="closeEditAdvisorModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form onsubmit="saveAdvisorTargets(event)" class="space-y-4">
+        <input type="hidden" id="edit-adv-phone" />
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Nombre del Asesor</label>
+          <input type="text" id="edit-adv-name" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Meta Mensual (Ventas)</label>
+            <input type="number" id="edit-adv-mensual" required min="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Meta Convención (Año)</label>
+            <input type="number" id="edit-adv-convencion" required min="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" />
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeEditAdvisorModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIGURACIÓN GOOGLE SHEETS -->
+  <div id="sheets-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display font-bold text-lg text-slate-900">Conexión con Google Sheets</h3>
+        <button onclick="closeSheetsModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">URL Web App de Google Apps Script (/exec)</label>
+          <input type="url" id="modal-sheets-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono" />
+        </div>
+        <div class="flex justify-end gap-2">
+          <button onclick="closeSheetsModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold">Cerrar</button>
+          <button onclick="saveTempSheetsUrl()" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold">Guardar y Sincronizar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- LÓGICA DE APLICACIÓN, GRÁFICAS Y BONO TRIMESTRAL          -->
+  <!-- ========================================================= -->
+  <script>
+    const MONTH_NAMES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    const FULL_MONTH_NAMES = {
+      "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril",
+      "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto",
+      "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre"
+    };
+
+    let appState = {
+      asesores: [],
+      reportes: [],
+      session: null,
+      pendingPhone: '',
+      charts: { monthly: null, advisor: null, type: null }
+    };
+
+    function getScriptUrl() {
+      const cfgUrl = (CONFIG.GOOGLE_SCRIPT_URL || '').trim();
+      if (cfgUrl) return cfgUrl;
+      return (localStorage.getItem('elite_temp_sheets_url') || '').trim();
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const brand = CONFIG.COMPANY_NAME || 'Élite Comercial';
+      document.getElementById('login-brand-name').textContent = brand.toUpperCase();
+      document.getElementById('nav-brand-name').textContent = brand.toUpperCase();
+      document.title = `${brand} | Gestión de Equipo & Convención`;
+
+      const now = new Date();
+      const yyyy = String(now.getFullYear());
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+
+      const fechaInput = document.getElementById('rep-fecha');
+      if (fechaInput) fechaInput.value = `${yyyy}-${mm}-${dd}`;
+
+      // Preseleccionar año y trimestre actual en filtros admin
+      const yearSelect = document.getElementById('filter-year');
+      if (yearSelect && [...yearSelect.options].some(o => o.value === yyyy)) {
+        yearSelect.value = yyyy;
+      }
+      const qSelect = document.getElementById('filter-quarter');
+      if (qSelect) {
+        qSelect.value = getQuarterFromMonth(Number(mm));
+      }
+
+      loadCache();
+      updateConnectionIndicator();
+      lucide.createIcons();
+
+      if (getScriptUrl()) {
+        await syncWithSheets(false);
+      }
+    });
+
+    function getQuarterFromMonth(m) {
+      if (m <= 3) return "Q1";
+      if (m <= 6) return "Q2";
+      if (m <= 9) return "Q3";
+      return "Q4";
+    }
+
+    function isMonthInQuarter(m, q) {
+      if (q === "Q1") return m >= 1 && m <= 3;
+      if (q === "Q2") return m >= 4 && m <= 6;
+      if (q === "Q3") return m >= 7 && m <= 9;
+      if (q === "Q4") return m >= 10 && m <= 12;
+      return false;
+    }
+
+    // Extrae el tipo de venta ("Usuario" o "Familiar") incluso si viene de registros anteriores
+    function parseTipoVenta(rep) {
+      const rawRamo = String(rep.ramo || "");
+      if (rep.tipoVenta === "Familiar" || rawRamo.startsWith("[Familiar]")) return "Familiar";
+      if (rep.tipoVenta === "Usuario" || rawRamo.startsWith("[Usuario]")) return "Usuario";
+      return "Usuario";
+    }
+
+    function cleanProductoName(rep) {
+      return String(rep.ramo || "General").replace(/^\[(Usuario|Familiar)\]\s*/i, "");
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-slate-900 text-white border-emerald-500',
+        error: 'bg-rose-950 text-white border-rose-500',
+        warning: 'bg-amber-950 text-white border-amber-500'
+      };
+      toast.className = `pointer-events-auto p-3.5 rounded-2xl shadow-xl border-l-4 text-xs font-medium flex items-center justify-between gap-3 transition-all ${colors[type] || colors.success}`;
+      toast.innerHTML = `<span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 3800);
+    }
+
+    function loadCache() {
+      try {
+        const cached = localStorage.getItem('elite_comercial_cache_v2');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          appState.asesores = parsed.asesores || [];
+          appState.reportes = parsed.reportes || [];
+        }
+      } catch (e) {}
+    }
+
+    function saveCache() {
+      try {
+        localStorage.setItem('elite_comercial_cache_v2', JSON.stringify({
+          asesores: appState.asesores,
+          reportes: appState.reportes
+        }));
+      } catch (e) {}
+    }
+
+    function updateConnectionIndicator() {
+      const badge = document.getElementById('connection-status-badge');
+      const url = getScriptUrl();
+      if (url && url.startsWith('https://script.google.com/')) {
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-emerald-700 font-semibold">Conectado a Google Sheets</span>`;
+      } else {
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span><span class="text-amber-700">Modo Local (Sin URL)</span>`;
+      }
+    }
+
+    async function apiCall(payload) {
+      const url = getScriptUrl();
+      if (!url) return null;
+
+      if (payload.action === 'sync') {
+        const res = await fetch(`${url}?action=sync&t=${Date.now()}`, { method: 'GET', redirect: 'follow' });
+        return await res.json();
+      } else {
+        const res = await fetch(url, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        return await res.json();
+      }
+    }
+
+    async function syncWithSheets(notify = false) {
+      const url = getScriptUrl();
+      if (!url) return;
+      const icon = document.getElementById('sync-icon');
+      if (icon) icon.classList.add('animate-spin');
+
+      try {
+        const res = await apiCall({ action: 'sync' });
+        if (res && res.status === 'ok' && res.data) {
+          appState.asesores = res.data.asesores || [];
+          appState.reportes = res.data.reportes || [];
+          saveCache();
+          refreshActiveView();
+          if (notify) showToast('Datos sincronizados correctamente.');
+        }
+      } catch (err) {
+        if (notify) showToast('No se pudo sincronizar con Google Sheets.', 'error');
+      } finally {
+        if (icon) icon.classList.remove('animate-spin');
+      }
+    }
+
+    // Navegación Roles Login
+    function switchLoginRole(role) {
+      const btnAdv = document.getElementById('role-btn-advisor');
+      const btnAdm = document.getElementById('role-btn-admin');
+      const panelAdv = document.getElementById('login-advisor-panel');
+      const panelAdm = document.getElementById('login-admin-panel');
+
+      if (role === 'advisor') {
+        btnAdv.className = "py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 bg-white text-slate-900 shadow-sm";
+        btnAdm.className = "py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800";
+        panelAdv.classList.remove('hidden');
+        panelAdm.classList.add('hidden');
+      } else {
+        btnAdm.className = "py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 bg-white text-slate-900 shadow-sm";
+        btnAdv.className = "py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 text-slate-500 hover:text-slate-800";
+        panelAdm.classList.remove('hidden');
+        panelAdv.classList.add('hidden');
+      }
+    }
+
+    async function handleAdvisorPhoneSubmit(e) {
+      e.preventDefault();
+      const raw = document.getElementById('advisor-phone-input').value.replace(/\D/g, '');
+      if (raw.length < 7) {
+        showToast('Ingresa un número celular válido.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('advisor-continue-btn');
+      btn.disabled = true;
+      await syncWithSheets(false);
+      btn.disabled = false;
+
+      const existing = appState.asesores.find(a => String(a.phone).replace(/\D/g, '') === raw);
+      if (existing) {
+        enterAdvisorSession(existing);
+      } else {
+        appState.pendingPhone = raw;
+        document.getElementById('register-phone-display').textContent = raw;
+        document.getElementById('advisor-phone-form').classList.add('hidden');
+        document.getElementById('advisor-register-form').classList.remove('hidden');
+        document.getElementById('advisor-name-input').focus();
+      }
+    }
+
+    function resetAdvisorLogin() {
+      document.getElementById('advisor-register-form').classList.add('hidden');
+      document.getElementById('advisor-phone-form').classList.remove('hidden');
+    }
+
+    async function handleAdvisorRegisterSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('advisor-name-input').value.trim();
+      const phone = appState.pendingPhone;
+      if (!name || !phone) return;
+
+      const btn = document.getElementById('advisor-register-btn');
+      btn.disabled = true;
+
+      const newAdvisor = {
+        phone: phone,
+        name: name,
+        metaMensual: CONFIG.DEFAULT_META_MENSUAL || 5,
+        metaConvencion: CONFIG.DEFAULT_META_CONVENCION || 45
+      };
+
+      try {
+        const res = await apiCall({
+          action: 'register_advisor',
+          ...newAdvisor
+        });
+        if (res && res.status === 'ok' && res.data) {
+          appState.asesores = res.data.asesores;
+          appState.reportes = res.data.reportes;
+        } else {
+          appState.asesores.push(newAdvisor);
+        }
+        saveCache();
+        enterAdvisorSession(newAdvisor);
+        showToast(`¡Bienvenido ${name}! Perfil creado.`);
+      } catch (err) {
+        appState.asesores.push(newAdvisor);
+        saveCache();
+        enterAdvisorSession(newAdvisor);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function enterAdvisorSession(advisor) {
+      appState.session = { role: 'advisor', phone: advisor.phone, name: advisor.name };
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('app-view').classList.remove('hidden');
+      document.getElementById('advisor-dashboard').classList.remove('hidden');
+      document.getElementById('admin-dashboard').classList.add('hidden');
+      document.getElementById('nav-user-subtitle').textContent = `Asesor: ${advisor.name}`;
+      renderAdvisorDashboard();
+      lucide.createIcons();
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('admin-user-input').value.trim();
+      const p = document.getElementById('admin-pass-input').value.trim();
+
+      if (u === CONFIG.ADMIN_USER && p === CONFIG.ADMIN_PASS) {
+        appState.session = { role: 'admin' };
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('app-view').classList.remove('hidden');
+        document.getElementById('advisor-dashboard').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        document.getElementById('nav-user-subtitle').textContent = 'Dirección Comercial';
+        renderAdminDashboard();
+        lucide.createIcons();
+      } else {
+        showToast('Usuario o contraseña incorrectos.', 'error');
+      }
+    }
+
+    function logout() {
+      appState.session = null;
+      document.getElementById('app-view').classList.add('hidden');
+      document.getElementById('login-view').classList.remove('hidden');
+      resetAdvisorLogin();
+    }
+
+    function refreshActiveView() {
+      if (!appState.session) return;
+      if (appState.session.role === 'advisor') renderAdvisorDashboard();
+      if (appState.session.role === 'admin') renderAdminDashboard();
+      lucide.createIcons();
+    }
+
+    // =========================================================
+    // RENDERIZADO PANEL DEL ASESOR
+    // =========================================================
+    function renderAdvisorDashboard() {
+      const phone = String(appState.session.phone).replace(/\D/g, '');
+      const advisor = appState.asesores.find(a => String(a.phone).replace(/\D/g, '') === phone) || {
+        phone,
+        name: appState.session.name,
+        metaMensual: CONFIG.DEFAULT_META_MENSUAL || 5,
+        metaConvencion: CONFIG.DEFAULT_META_CONVENCION || 45
+      };
+
+      // Normalizar metas antiguas en pesos si existieran
+      const metaMes = advisor.metaMensual > 1000 ? (CONFIG.DEFAULT_META_MENSUAL || 5) : (advisor.metaMensual || 5);
+      const metaConv = advisor.metaConvencion > 10000 ? (CONFIG.DEFAULT_META_CONVENCION || 45) : (advisor.metaConvencion || 45);
+      const metaBono = CONFIG.META_BONO_TRIMESTRAL || 11;
+
+      document.getElementById('adv-welcome-name').textContent = advisor.name;
+      document.getElementById('adv-welcome-phone').textContent = advisor.phone;
+
+      const now = new Date();
+      const curYear = String(now.getFullYear());
+      const curMonth = now.getMonth() + 1;
+      const curQuarter = getQuarterFromMonth(curMonth);
+
+      document.getElementById('adv-quarter-label').textContent = `Trimestre Actual: ${curQuarter} (${curYear})`;
+
+      const myReports = appState.reportes.filter(r => String(r.phone).replace(/\D/g, '') === phone);
+
+      let monthSales = 0;
+      let yearSales = 0;
+      let quarterSales = 0;
+      let countUsuario = 0;
+      let countFamiliar = 0;
+
+      myReports.forEach(r => {
+        const parts = String(r.fecha || '').split('-');
+        const rYear = parts[0];
+        const rMonth = Number(parts[1] || 0);
+        const qty = Number(r.polizas) || 1;
+        const tipo = parseTipoVenta(r);
+
+        if (rYear === curYear) {
+          yearSales += qty;
+          if (rMonth === curMonth) monthSales += qty;
+          if (isMonthInQuarter(rMonth, curQuarter)) quarterSales += qty;
+        }
+        if (tipo === 'Familiar') countFamiliar += qty;
+        else countUsuario += qty;
+      });
+
+      // Bono Trimestral (>= 11 ventas)
+      document.getElementById('adv-quarter-sales').textContent = quarterSales;
+      const bonusPct = Math.min(100, Math.round((quarterSales / metaBono) * 100));
+      document.getElementById('adv-bonus-bar').style.width = `${bonusPct}%`;
+
+      const bonusBadge = document.getElementById('adv-bonus-badge');
+      const bonusMsg = document.getElementById('adv-bonus-msg');
+      if (quarterSales >= metaBono) {
+        bonusBadge.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white";
+        bonusBadge.textContent = "¡CALIFICADO!";
+        bonusMsg.innerHTML = `<span class="text-emerald-300 font-bold">¡Felicitaciones!</span> Superaste las 11 ventas y calificas a Bono Trimestral.`;
+      } else {
+        const faltan = metaBono - quarterSales;
+        bonusBadge.className = "px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300";
+        bonusBadge.textContent = `${bonusPct}% completado`;
+        bonusMsg.textContent = `Te faltan ${faltan} venta${faltan === 1 ? '' : 's'} en ${curQuarter} para ganar tu bono trimestral.`;
+      }
+
+      // KPIs Mes y Año
+      document.getElementById('adv-month-sales').textContent = monthSales;
+      document.getElementById('adv-month-target').textContent = metaMes;
+      document.getElementById('adv-month-bar').style.width = `${Math.min(100, (monthSales / metaMes) * 100)}%`;
+
+      document.getElementById('adv-year-sales').textContent = yearSales;
+      document.getElementById('adv-conv-target').textContent = metaConv;
+      document.getElementById('adv-conv-bar').style.width = `${Math.min(100, (yearSales / metaConv) * 100)}%`;
+
+      document.getElementById('adv-count-usuario').textContent = countUsuario;
+      document.getElementById('adv-count-familiar').textContent = countFamiliar;
+
+      // Tabla historial
+      document.getElementById('adv-history-count').textContent = `${myReports.length} registros`;
+      const tbody = document.getElementById('adv-reports-tbody');
+      if (myReports.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">Aún no has reportado ventas. ¡Registra tu primer cierre hoy!</td></tr>`;
+      } else {
+        const sorted = [...myReports].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+        tbody.innerHTML = sorted.map(r => {
+          const tipo = parseTipoVenta(r);
+          const badgeTipo = tipo === 'Familiar'
+            ? `<span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">Familiar</span>`
+            : `<span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold">Usuario</span>`;
+          return `
+            <tr class="hover:bg-slate-50/80">
+              <td class="py-3 px-2 text-xs text-slate-500 font-medium">${r.fecha}</td>
+              <td class="py-3 px-2 font-semibold text-slate-800 text-xs sm:text-sm">${r.cliente}</td>
+              <td class="py-3 px-2">${badgeTipo}</td>
+              <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)}</td>
+              <td class="py-3 px-2 text-center font-bold text-slate-900">${r.polizas || 1}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    async function handleAddReport(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-report');
+      btn.disabled = true;
+
+      const tipoVenta = document.querySelector('input[name="tipo-venta"]:checked').value;
+      const cliente = document.getElementById('rep-cliente').value.trim();
+      const producto = document.getElementById('rep-ramo').value;
+      const polizas = Number(document.getElementById('rep-polizas').value) || 1;
+      const fecha = document.getElementById('rep-fecha').value;
+
+      // Guardamos el tipo de venta codificado en el ramo para compatibilidad directa con tu Google Sheet actual
+      const ramoConTipo = `[${tipoVenta}] ${producto}`;
+
+      const newRep = {
+        id: 'REP-' + Date.now(),
+        fecha: fecha,
+        phone: appState.session.phone,
+        asesor: appState.session.name,
+        cliente: cliente,
+        ramo: ramoConTipo,
+        tipoVenta: tipoVenta,
+        valor: 0, // Sin monto en pesos
+        polizas: polizas
+      };
+
+      try {
+        const res = await apiCall({ action: 'add_report', ...newRep });
+        if (res && res.status === 'ok' && res.data) {
+          appState.asesores = res.data.asesores;
+          appState.reportes = res.data.reportes;
+        } else {
+          appState.reportes.push(newRep);
+        }
+        saveCache();
+        document.getElementById('rep-cliente').value = '';
+        document.getElementById('rep-polizas').value = '1';
+        renderAdvisorDashboard();
+        showToast('¡Venta registrada con éxito!');
+      } catch (err) {
+        appState.reportes.push(newRep);
+        saveCache();
+        renderAdvisorDashboard();
+        showToast('Venta guardada localmente.', 'warning');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // =========================================================
+    // RENDERIZADO PANEL DEL DIRECTOR / ADMINISTRADOR + GRÁFICAS
+    // =========================================================
+    function renderAdminDashboard() {
+      const selYear = document.getElementById('filter-year').value;
+      const selMonth = document.getElementById('filter-month').value;
+      const selQuarter = document.getElementById('filter-quarter').value;
+      const metaBono = CONFIG.META_BONO_TRIMESTRAL || 11;
+
+      document.getElementById('chart-year-label').textContent = selYear;
+      document.getElementById('chart-quarter-badge').textContent = selQuarter;
+      document.getElementById('th-quarter-name').textContent = selQuarter;
+
+      // Reportes del año seleccionado
+      const yearReports = appState.reportes.filter(r => String(r.fecha || '').startsWith(selYear));
+
+      // Reportes filtrados por mes (si no es ALL)
+      const periodReports = selMonth === 'ALL'
+        ? yearReports
+        : yearReports.filter(r => String(r.fecha || '').split('-')[1] === selMonth);
+
+      // Cálculo de totales del periodo
+      let totalVentasPeriodo = 0;
+      let totalUsuarios = 0;
+      let totalFamiliar = 0;
+
+      // Serie mensual Enero (0) a Diciembre (11)
+      const monthlyTotals = new Array(12).fill(0);
+      const monthlyUsuarios = new Array(12).fill(0);
+      const monthlyFamiliar = new Array(12).fill(0);
+
+      yearReports.forEach(r => {
+        const mIdx = Number(String(r.fecha || '').split('-')[1] || 0) - 1;
+        const qty = Number(r.polizas) || 1;
+        const tipo = parseTipoVenta(r);
+        if (mIdx >= 0 && mIdx < 12) {
+          monthlyTotals[mIdx] += qty;
+          if (tipo === 'Familiar') monthlyFamiliar[mIdx] += qty;
+          else monthlyUsuarios[mIdx] += qty;
+        }
+      });
+
+      periodReports.forEach(r => {
+        const qty = Number(r.polizas) || 1;
+        const tipo = parseTipoVenta(r);
+        totalVentasPeriodo += qty;
+        if (tipo === 'Familiar') totalFamiliar += qty;
+        else totalUsuarios += qty;
+      });
+
+      // Construcción de estadísticas por asesor
+      const advisorMap = {};
+      appState.asesores.forEach(a => {
+        const p = String(a.phone).replace(/\D/g, '');
+        advisorMap[p] = {
+          phone: p,
+          name: a.name,
+          metaMes: a.metaMensual > 1000 ? (CONFIG.DEFAULT_META_MENSUAL || 5) : (a.metaMensual || 5),
+          metaConv: a.metaConvencion > 10000 ? (CONFIG.DEFAULT_META_CONVENCION || 45) : (a.metaConvencion || 45),
+          ventasPeriodo: 0,
+          usuariosPeriodo: 0,
+          familiarPeriodo: 0,
+          ventasTrimestre: 0,
+          ventasAnio: 0
+        };
+      });
+
+      yearReports.forEach(r => {
+        const p = String(r.phone).replace(/\D/g, '');
+        if (!advisorMap[p]) {
+          advisorMap[p] = {
+            phone: p,
+            name: r.asesor || p,
+            metaMes: CONFIG.DEFAULT_META_MENSUAL || 5,
+            metaConv: CONFIG.DEFAULT_META_CONVENCION || 45,
+            ventasPeriodo: 0,
+            usuariosPeriodo: 0,
+            familiarPeriodo: 0,
+            ventasTrimestre: 0,
+            ventasAnio: 0
+          };
+        }
+        const mNum = Number(String(r.fecha || '').split('-')[1] || 0);
+        const mStr = String(r.fecha || '').split('-')[1];
+        const qty = Number(r.polizas) || 1;
+        const tipo = parseTipoVenta(r);
+
+        advisorMap[p].ventasAnio += qty;
+        if (isMonthInQuarter(mNum, selQuarter)) {
+          advisorMap[p].ventasTrimestre += qty;
+        }
+        if (selMonth === 'ALL' || mStr === selMonth) {
+          advisorMap[p].ventasPeriodo += qty;
+          if (tipo === 'Familiar') advisorMap[p].familiarPeriodo += qty;
+          else advisorMap[p].usuariosPeriodo += qty;
+        }
+      });
+
+      const advisorList = Object.values(advisorMap).sort((a, b) => b.ventasPeriodo - a.ventasPeriodo);
+      const qualifiedCount = advisorList.filter(a => a.ventasTrimestre >= metaBono).length;
+
+      // Actualizar tarjetas KPI
+      document.getElementById('kpi-total-ventas').textContent = totalVentasPeriodo;
+      document.getElementById('kpi-periodo-desc').textContent = selMonth === 'ALL'
+        ? `Consolidado año ${selYear}`
+        : `Mes de ${FULL_MONTH_NAMES[selMonth]} ${selYear}`;
+
+      document.getElementById('kpi-usuarios-count').textContent = totalUsuarios;
+      document.getElementById('kpi-familiar-count').textContent = totalFamiliar;
+      const pctFam = totalVentasPeriodo > 0 ? Math.round((totalFamiliar / totalVentasPeriodo) * 100) : 0;
+      document.getElementById('kpi-mix-pct').textContent = `${100 - pctFam}% Usuario • ${pctFam}% Familiar`;
+
+      document.getElementById('kpi-bonus-qualified').textContent = qualifiedCount;
+      document.getElementById('kpi-total-advisors').textContent = advisorList.length;
+      document.getElementById('kpi-quarter-desc').textContent = `Asesores con ≥ ${metaBono} ventas en ${selQuarter}`;
+
+      if (advisorList.length > 0 && advisorList[0].ventasPeriodo > 0) {
+        document.getElementById('kpi-top-advisor').textContent = advisorList[0].name;
+        document.getElementById('kpi-top-advisor-sales').textContent = `${advisorList[0].ventasPeriodo} ventas cerradas`;
+      } else {
+        document.getElementById('kpi-top-advisor').textContent = 'Sin registros';
+        document.getElementById('kpi-top-advisor-sales').textContent = '0 ventas cerradas';
+      }
+
+      document.getElementById('chart-legend-usuario').textContent = totalUsuarios;
+      document.getElementById('chart-legend-familiar').textContent = totalFamiliar;
+
+      // Renderizar las 3 gráficas
+      renderAdminCharts(monthlyUsuarios, monthlyFamiliar, advisorList, metaBono, totalUsuarios, totalFamiliar);
+
+      // Renderizar Tabla Ranking + Bono Trimestral
+      const rankTbody = document.getElementById('admin-ranking-tbody');
+      if (advisorList.length === 0) {
+        rankTbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">No hay asesores registrados aún.</td></tr>`;
+      } else {
+        rankTbody.innerHTML = advisorList.map((a, idx) => {
+          const califica = a.ventasTrimestre >= metaBono;
+          const faltan = Math.max(0, metaBono - a.ventasTrimestre);
+          const bonoBadge = califica
+            ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold"><i data-lucide="award" class="w-3.5 h-3.5"></i> Califica Bono</span>`
+            : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">Faltan ${faltan}</span>`;
+
+          return `
+            <tr class="hover:bg-slate-50/80">
+              <td class="py-3 px-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full ${idx === 0 ? 'gold-gradient text-white' : 'bg-slate-100 text-slate-600'} text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+                  <div>
+                    <span class="font-bold text-slate-900 block text-xs sm:text-sm">${a.name}</span>
+                    <span class="text-[11px] text-slate-400">${a.phone}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3 px-2 text-center font-display font-extrabold text-base text-slate-900">${a.ventasPeriodo}</td>
+              <td class="py-3 px-2 text-center text-xs">
+                <span class="font-semibold text-emerald-700">${a.usuariosPeriodo} U</span> /
+                <span class="font-semibold text-indigo-700">${a.familiarPeriodo} F</span>
+              </td>
+              <td class="py-3 px-2 text-center">
+                <span class="font-display font-bold text-sm ${califica ? 'text-emerald-600' : 'text-slate-700'}">${a.ventasTrimestre}</span>
+                <span class="text-[11px] text-slate-400">/ ${metaBono}</span>
+              </td>
+              <td class="py-3 px-2">${bonoBadge}</td>
+              <td class="py-3 px-2 text-right">
+                <button onclick="openEditAdvisorModal('${a.phone}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
+                  ${a.metaMes} / ${a.metaConv} ✎
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Renderizar Tabla Movimientos Detallados
+      document.getElementById('admin-movements-count').textContent = `${periodReports.length} movimientos`;
+      const repTbody = document.getElementById('admin-reports-tbody');
+      if (periodReports.length === 0) {
+        repTbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400 text-xs">No hay ventas registradas en este filtro.</td></tr>`;
+      } else {
+        const sortedRep = [...periodReports].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+        repTbody.innerHTML = sortedRep.map(r => {
+          const tipo = parseTipoVenta(r);
+          const badgeTipo = tipo === 'Familiar'
+            ? `<span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">Familiar</span>`
+            : `<span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold">Usuario</span>`;
+
+          return `
+            <tr class="hover:bg-slate-50/80">
+              <td class="py-3 px-2 text-xs text-slate-500">${r.fecha}</td>
+              <td class="py-3 px-2 font-semibold text-slate-800 text-xs sm:text-sm">${r.asesor}</td>
+              <td class="py-3 px-2 text-xs sm:text-sm text-slate-700">${r.cliente}</td>
+              <td class="py-3 px-2">${badgeTipo}</td>
+              <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)}</td>
+              <td class="py-3 px-2 text-center font-bold text-slate-900">${r.polizas || 1}</td>
+              <td class="py-3 px-2 text-right">
+                <button onclick="deleteReport('${r.id}')" title="Eliminar registro" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderAdminCharts(monthlyUsuarios, monthlyFamiliar, advisorList, metaBono, totalUsuarios, totalFamiliar) {
+      // 1. Gráfica Mensual Ene - Dic (Barras Apiladas Usuario + Familiar)
+      const ctxMonthly = document.getElementById('monthlyChart').getContext('2d');
+      if (appState.charts.monthly) appState.charts.monthly.destroy();
+      appState.charts.monthly = new Chart(ctxMonthly, {
+        type: 'bar',
+        data: {
+          labels: MONTH_NAMES,
+          datasets: [
+            {
+              label: 'Usuario Individual',
+              data: monthlyUsuarios,
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            },
+            {
+              label: 'Plan Familiar',
+              data: monthlyFamiliar,
+              backgroundColor: '#6366f1',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+          scales: {
+            x: { stacked: true, grid: { display: false } },
+            y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+
+      // 2. Gráfica de Cumplimiento por Asesor en el Trimestre (Verde si >= 11, Ámbar si < 11)
+      const ctxAdv = document.getElementById('advisorComplianceChart').getContext('2d');
+      if (appState.charts.advisor) appState.charts.advisor.destroy();
+      const topAdvisors = advisorList.slice(0, 15);
+      appState.charts.advisor = new Chart(ctxAdv, {
+        type: 'bar',
+        data: {
+          labels: topAdvisors.map(a => a.name.split(' ')[0]),
+          datasets: [{
+            label: 'Ventas Trimestre',
+            data: topAdvisors.map(a => a.ventasTrimestre),
+            backgroundColor: topAdvisors.map(a => a.ventasTrimestre >= metaBono ? '#10b981' : '#f59e0b'),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, suggestedMax: 12, ticks: { stepSize: 2 } },
+            y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+          }
+        }
+      });
+
+      // 3. Gráfica Dona Tipo de Venta (Usuario vs Familiar)
+      const ctxType = document.getElementById('typeChart').getContext('2d');
+      if (appState.charts.type) appState.charts.type.destroy();
+      appState.charts.type = new Chart(ctxType, {
+        type: 'doughnut',
+        data: {
+          labels: ['Usuario', 'Familiar'],
+          datasets: [{
+            data: [totalUsuarios, totalFamiliar],
+            backgroundColor: ['#10b981', '#6366f1'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '68%',
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    async function deleteReport(id) {
+      if (!confirm('¿Eliminar este registro de venta?')) return;
+      try {
+        const res = await apiCall({ action: 'delete_report', id });
+        if (res && res.status === 'ok' && res.data) {
+          appState.asesores = res.data.asesores;
+          appState.reportes = res.data.reportes;
+        } else {
+          appState.reportes = appState.reportes.filter(r => r.id !== id);
+        }
+        saveCache();
+        renderAdminDashboard();
+        lucide.createIcons();
+        showToast('Registro eliminado.');
+      } catch (e) {
+        showToast('Error al eliminar.', 'error');
+      }
+    }
+
+    function openEditAdvisorModal(phone) {
+      const adv = appState.asesores.find(a => String(a.phone).replace(/\D/g, '') === phone);
+      if (!adv) return;
+      document.getElementById('edit-adv-phone').value = adv.phone;
+      document.getElementById('edit-adv-name').value = adv.name;
+      document.getElementById('edit-adv-mensual').value = adv.metaMensual > 1000 ? 5 : adv.metaMensual;
+      document.getElementById('edit-adv-convencion').value = adv.metaConvencion > 10000 ? 45 : adv.metaConvencion;
+      const modal = document.getElementById('edit-advisor-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeEditAdvisorModal() {
+      const modal = document.getElementById('edit-advisor-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveAdvisorTargets(e) {
+      e.preventDefault();
+      const phone = document.getElementById('edit-adv-phone').value;
+      const name = document.getElementById('edit-adv-name').value.trim();
+      const metaMensual = Number(document.getElementById('edit-adv-mensual').value) || 5;
+      const metaConvencion = Number(document.getElementById('edit-adv-convencion').value) || 45;
+
+      try {
+        const res = await apiCall({
+          action: 'update_advisor',
+          phone,
+          name,
+          metaMensual,
+          metaConvencion
+        });
+        if (res && res.status === 'ok' && res.data) {
+          appState.asesores = res.data.asesores;
+          appState.reportes = res.data.reportes;
+        }
+        saveCache();
+        closeEditAdvisorModal();
+        renderAdminDashboard();
+        lucide.createIcons();
+        showToast('Metas actualizadas.');
+      } catch (err) {
+        showToast('Error al actualizar metas.', 'error');
+      }
+    }
+
+    function openSheetsModal() {
+      const modal = document.getElementById('sheets-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.getElementById('modal-sheets-url-input').value = getScriptUrl();
+    }
+
+    function closeSheetsModal() {
+      const modal = document.getElementById('sheets-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveTempSheetsUrl() {
+      const url = document.getElementById('modal-sheets-url-input').value.trim();
+      localStorage.setItem('elite_temp_sheets_url', url);
+      updateConnectionIndicator();
+      closeSheetsModal();
+      if (url) await syncWithSheets(true);
+    }
+
+    function exportReportsCSV() {
+      const headers = ['ID', 'Fecha', 'Telefono', 'Asesor', 'Cliente', 'TipoVenta', 'Producto', 'Ventas'];
+      const rows = appState.reportes.map(r => [
+        r.id,
+        r.fecha,
+        r.phone,
+        `"${String(r.asesor || '').replace(/"/g, '""')}"`,
+        `"${String(r.cliente || '').replace(/"/g, '""')}"`,
+        parseTipoVenta(r),
+        `"${cleanProductoName(r).replace(/"/g, '""')}"`,
+        r.polizas || 1
+      ]);
+      const csv = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Consolidado_Comercial_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('Archivo Excel (CSV) descargado.');
+    }
+  </script>
+</body>
+</html>
