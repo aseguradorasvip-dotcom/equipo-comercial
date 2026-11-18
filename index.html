@@ -156,7 +156,7 @@
       <!-- Banner Principal de Convención e Indicadores -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Tarjeta Dinámica de Convención Internacional (Más Visible) -->
+        <!-- Tarjeta Dinámica de Convención Internacional -->
         <div class="lg:col-span-7 navy-gradient rounded-3xl p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
           <div class="absolute -right-6 -bottom-6 w-40 h-40 bg-amber-500/15 rounded-full blur-2xl pointer-events-none"></div>
           <div>
@@ -201,7 +201,7 @@
 
       </div>
 
-      <!-- KPIs Secundarios del Asesor (Mes y Bolsa Millonaria) -->
+      <!-- KPIs Secundarios del Asesor -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow flex items-center justify-between">
           <div>
@@ -223,7 +223,7 @@
               <span class="font-display font-extrabold text-2xl text-slate-900">Activa</span>
               <span class="text-xs text-emerald-600 font-bold">● Acumulando</span>
             </div>
-            <p class="text-[11px] text-slate-500 mt-0.5">Participación por cumplimiento colectivo y individual.</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Participación por cumplimiento colectivo e individual.</p>
           </div>
           <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
             <i data-lucide="sparkles" class="w-6 h-6"></i>
@@ -231,7 +231,7 @@
         </div>
       </div>
 
-      <!-- Formulario de Reporte y Mis Ventas (Con Opción de Eliminar) -->
+      <!-- Formulario de Reporte y Mis Ventas -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <!-- Formulario -->
@@ -407,7 +407,7 @@
         </div>
       </div>
 
-      <!-- KPIs Globales (Incluyendo Bolsa Millonaria y Convención) -->
+      <!-- KPIs Globales -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
           <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
@@ -519,7 +519,7 @@
         </div>
       </div>
 
-      <!-- Detalle de Movimientos con Opción de Eliminar -->
+      <!-- Detalle de Movimientos -->
       <div class="bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -700,13 +700,13 @@
 
     function loadCache() {
       try {
-        const cached = localStorage.getItem('elite_comercial_cache_v4');
+        const cached = localStorage.getItem('elite_comercial_cache_v3');
         if (cached) { const p = JSON.parse(cached); appState.asesores = p.asesores || []; appState.reportes = p.reportes || []; }
       } catch (e) {}
     }
 
     function saveCache() {
-      try { localStorage.setItem('elite_comercial_cache_v4', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
+      try { localStorage.setItem('elite_comercial_cache_v3', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
     }
 
     function updateConnectionIndicator() {
@@ -789,17 +789,25 @@
       renderAdvisorDashboard(); lucide.createIcons();
     }
 
-    function handleAdminLogin(e) {
+    async function handleAdminLogin(e) {
       e.preventDefault();
-      if (document.getElementById('admin-user-input').value.trim() === CONFIG.ADMIN_USER && document.getElementById('admin-pass-input').value.trim() === CONFIG.ADMIN_PASS) {
+      const u = document.getElementById('admin-user-input').value.trim();
+      const p = document.getElementById('admin-pass-input').value.trim();
+
+      if (u === CONFIG.ADMIN_USER && p === CONFIG.ADMIN_PASS) {
         appState.session = { role: 'admin' };
         document.getElementById('login-view').classList.add('hidden');
         document.getElementById('app-view').classList.remove('hidden');
         document.getElementById('advisor-dashboard').classList.add('hidden');
         document.getElementById('admin-dashboard').classList.remove('hidden');
         document.getElementById('nav-user-subtitle').textContent = 'Dirección Comercial';
-        renderAdminDashboard(); lucide.createIcons();
-      } else { showToast('Credenciales de administrador incorrectas.', 'error'); }
+        
+        renderAdminDashboard();
+        lucide.createIcons();
+        await syncWithSheets(false);
+      } else {
+        showToast('Credenciales de administrador incorrectas.', 'error');
+      }
     }
 
     function logout() {
