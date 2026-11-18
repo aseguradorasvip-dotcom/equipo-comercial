@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -14,14 +14,25 @@
     .navy-gradient { background: linear-gradient(135deg, #090d16 0%, #0f172a 55%, #1e293b 100%); }
     .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
     .card-shadow { box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06); }
+    
+    /* NUEVOS ESTILOS PARA PANELES ACTUALIZADOS */
+    .istanbul-bg {
+      background-image: linear-gradient(to bottom, rgba(9, 13, 22, 0.7), rgba(15, 23, 42, 0.9)), 
+                        url('https://images.unsplash.com/photo-1666529630095-b65d254d1564?q=80&w=1200');
+      background-size: cover;
+      background-position: center;
+      background-blend-mode: multiply;
+    }
+    .monetary-glow {
+      box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-white">
 
-  <!-- CONTENEDOR DE NOTIFICACIONES TOAST -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
-  <!-- CONFIGURACIÓN PRINCIPAL -->
   <script>
     const CONFIG = {
       GOOGLE_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxXV8cXWRzBG2qMYsf1-RdCD56KTJ6nTxSSo7VkBBXl90WzrUYbbF9F3VyuJHWSYvtFfw/exec",
@@ -30,6 +41,7 @@
       DEFAULT_META_MENSUAL: 5,
       DEFAULT_META_CONVENCION: 45,
       META_BONO_TRIMESTRAL: 11,
+      VALOR_BONO_TRIMESTRAL: "1,500,000", // Nuevo: Valor del bono
       DEFAULT_ADVISOR_PASS: "1234",
       COMPANY_NAME: "Élite Comercial"
     };
@@ -153,39 +165,38 @@
     <!-- VISTA A: PANEL DEL ASESOR -->
     <div id="advisor-dashboard" class="max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 hidden">
       
-      <!-- Banner Principal de Convención e Indicadores -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Tarjeta Dinámica de Convención Internacional -->
-        <div class="lg:col-span-7 navy-gradient rounded-3xl p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between">
-          <div class="absolute -right-6 -bottom-6 w-40 h-40 bg-amber-500/15 rounded-full blur-2xl pointer-events-none"></div>
-          <div>
+        <!-- TARJETA CONVENCIÓN (NUEVO DISEÑO ESTAMBUL) -->
+        <div class="lg:col-span-7 istanbul-bg rounded-3xl p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[200px]">
+          <div class="absolute right-0 bottom-0 w-1/2 h-1/2 opacity-20 bg-contain bg-no-repeat bg-right-bottom" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Flag_of_Turkey_%28state%29.svg/1280px-Flag_of_Turkey_%28state%29.svg.png');"></div>
+          <div class="z-10">
             <div class="flex items-center justify-between mb-3">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/30 text-amber-200 text-xs font-bold border border-amber-500/50 backdrop-blur-sm">
                 <i data-lucide="plane" class="w-3.5 h-3.5"></i> Convención Internacional
               </span>
-              <span id="adv-conv-status" class="text-xs font-semibold text-slate-300">En camino</span>
+              <span id="adv-conv-status" class="text-xs font-semibold text-slate-200">En camino</span>
             </div>
-            <h1 class="font-display font-extrabold text-2xl sm:text-3xl">Meta Anual: <span id="adv-conv-target-num">45</span> Ventas</h1>
-            <p class="text-slate-300 text-xs sm:text-sm mt-1">Acumulado actual: <strong id="adv-year-sales" class="text-amber-400 text-lg">0</strong> pólizas cerradas este año.</p>
+            <h1 class="font-display font-extrabold text-2xl sm:text-3xl drop-shadow-sm">Meta Anual: <span id="adv-conv-target-num">45</span> Ventas</h1>
+            <p class="text-slate-100 text-xs sm:text-sm mt-1 drop-shadow-sm">Acumulado actual: <strong id="adv-year-sales" class="text-amber-300 text-lg font-bold">0</strong> pólizas cerradas este año.</p>
           </div>
-          <div class="mt-6 pt-4 border-t border-white/10">
-            <div class="flex justify-between text-xs text-slate-300 mb-1.5">
+          <div class="mt-6 pt-4 border-t border-white/10 z-10">
+            <div class="flex justify-between text-xs text-slate-200 mb-1.5 font-medium">
               <span>Progreso hacia el viaje</span>
               <span id="adv-conv-pct">0%</span>
             </div>
-            <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden p-0.5 border border-white/10">
+            <div class="w-full bg-slate-800/50 backdrop-blur-sm rounded-full h-3 overflow-hidden p-0.5 border border-white/10">
               <div id="adv-conv-bar" class="gold-gradient h-full rounded-full transition-all duration-700" style="width: 0%"></div>
             </div>
           </div>
         </div>
 
-        <!-- Tarjeta de Bono Trimestral -->
-        <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 card-shadow flex flex-col justify-between">
+        <!-- TARJETA BONO (NUEVO DISEÑO DINERO) -->
+        <div id="adv-bonus-card" class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 card-shadow flex flex-col justify-between transition-all duration-300">
           <div>
             <div class="flex items-center justify-between mb-2">
-              <span id="adv-quarter-label" class="text-xs font-bold uppercase tracking-wider text-amber-600">Trimestre Q1</span>
-              <span id="adv-bonus-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">En progreso</span>
+              <span id="adv-quarter-label" class="text-xs font-bold uppercase tracking-wider text-emerald-700">Trimestre Q1</span>
+              <span id="adv-bonus-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">En progreso</span>
             </div>
             <h3 class="font-display font-bold text-lg text-slate-900">Bono Trimestral</h3>
             <div class="flex items-baseline gap-2 mt-2">
@@ -193,15 +204,21 @@
               <span class="text-xs text-slate-500">/ 11 ventas requeridas</span>
             </div>
           </div>
-          <div class="w-full bg-slate-100 rounded-full h-2.5 mt-4 overflow-hidden">
-            <div id="adv-bonus-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+          <div class="mt-4 space-y-2">
+            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+              <div id="adv-bonus-bar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p id="adv-bonus-msg" class="text-xs text-slate-500 text-center">Te faltan 11 ventas para activar tu bono.</p>
           </div>
-          <p id="adv-bonus-msg" class="text-[11px] text-slate-500 mt-2">Te faltan 11 ventas para activar tu bono.</p>
+          <div id="adv-bonus-value-box" class="mt-4 pt-3 border-t border-slate-100 text-center hidden">
+            <span class="block text-[11px] text-emerald-600 font-medium uppercase tracking-wider">Bono Ganado</span>
+            <span class="font-display font-bold text-2xl text-emerald-800">$<span id="adv-bonus-amount">1,500,000</span></span>
+          </div>
         </div>
 
       </div>
 
-      <!-- KPIs Secundarios del Asesor -->
+      <!-- KPIs Secundarios -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow flex items-center justify-between">
           <div>
@@ -223,7 +240,7 @@
               <span class="font-display font-extrabold text-2xl text-slate-900">Activa</span>
               <span class="text-xs text-emerald-600 font-bold">● Acumulando</span>
             </div>
-            <p class="text-[11px] text-slate-500 mt-0.5">Participación por cumplimiento colectivo e individual.</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Participación por cumplimiento colectivo.</p>
           </div>
           <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
             <i data-lucide="sparkles" class="w-6 h-6"></i>
@@ -231,7 +248,7 @@
         </div>
       </div>
 
-      <!-- Formulario de Reporte y Mis Ventas -->
+      <!-- Formulario y Mis Ventas -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <!-- Formulario -->
@@ -317,7 +334,6 @@
           </form>
         </div>
 
-        <!-- Historial con botón de Eliminar -->
         <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
           <div class="flex items-center justify-between mb-4">
             <div>
@@ -350,7 +366,6 @@
     <!-- VISTA B: PANEL DEL DIRECTOR / ADMINISTRADOR -->
     <div id="admin-dashboard" class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 hidden">
       
-      <!-- Controles Superiores -->
       <div class="bg-white rounded-3xl p-5 border border-slate-100 card-shadow flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <h1 class="font-display font-bold text-xl sm:text-2xl text-slate-900">Tablero de Dirección Comercial</h1>
@@ -407,7 +422,6 @@
         </div>
       </div>
 
-      <!-- KPIs Globales -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
           <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
@@ -454,12 +468,11 @@
         </div>
       </div>
 
-      <!-- Gráficas del Administrador -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Movimiento Mensual (Enero – Diciembre)</h2>
+              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Movimiento Mensual</h2>
               <p class="text-xs text-slate-500">Historial anual de cierres</p>
             </div>
             <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold">Anual</span>
@@ -471,7 +484,7 @@
           <div class="flex items-center justify-between mb-4">
             <div>
               <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Cumplimiento por Asesor</h2>
-              <p class="text-xs text-slate-500">Trimestre actual (Meta Bono: 11)</p>
+              <p class="text-xs text-slate-500">Trimestre actual (Meta: 11)</p>
             </div>
             <span id="chart-quarter-badge" class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-bold">Q1</span>
           </div>
@@ -479,7 +492,6 @@
         </div>
       </div>
 
-      <!-- Tabla de Asesores y Credenciales -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-4 bg-white rounded-3xl p-6 border border-slate-100 card-shadow flex flex-col justify-between">
           <div>
@@ -496,8 +508,8 @@
         <div class="lg:col-span-8 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
-              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Equipo Comercial, Credenciales y Bono</h2>
-              <p class="text-xs text-slate-500">Edita contraseñas o metas de cada asesor</p>
+              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Equipo Comercial & Bonos</h2>
+              <p class="text-xs text-slate-500">Gestión de credenciales y estado de bono</p>
             </div>
             <button onclick="openCreateAdvisorModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition self-start">+ Nuevo Asesor</button>
           </div>
@@ -519,11 +531,10 @@
         </div>
       </div>
 
-      <!-- Detalle de Movimientos -->
       <div class="bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">Detalle de Movimientos del Periodo</h3>
+            <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">Detalle de Movimientos</h3>
             <p class="text-xs text-slate-500">Control y eliminación de reportes</p>
           </div>
           <span id="admin-movements-count" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">0 movimientos</span>
@@ -549,11 +560,11 @@
     </div>
   </div>
 
-  <!-- MODAL CREAR / EDITAR ASESOR -->
+  <!-- MODAL ASESOR -->
   <div id="advisor-form-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-4">
-        <h3 id="advisor-modal-title" class="font-display font-bold text-lg text-slate-900">Registrar Nuevo Asesor</h3>
+        <h3 id="advisor-modal-title" class="font-display font-bold text-lg text-slate-900">Registrar Asesor</h3>
         <button onclick="closeAdvisorFormModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form onsubmit="saveAdvisorForm(event)" class="space-y-4">
@@ -590,11 +601,11 @@
     </div>
   </div>
 
-  <!-- MODAL CONFIGURACIÓN SHEETS -->
+  <!-- MODAL CONFIG -->
   <div id="sheets-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-display font-bold text-lg text-slate-900">Conexión con Google Sheets</h3>
+        <h3 class="font-display font-bold text-lg text-slate-900">Configuración de Conexión</h3>
         <button onclick="closeSheetsModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <div class="space-y-4">
@@ -610,15 +621,8 @@
     </div>
   </div>
 
-  <!-- LÓGICA DE JAVASCRIPT -->
   <script>
     const MONTH_NAMES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-    const FULL_MONTH_NAMES = {
-      "01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril",
-      "05": "Mayo", "06": "Junio", "07": "Julio", "08": "Agosto",
-      "09": "Septiembre", "10": "Octubre", "11": "Noviembre", "12": "Diciembre"
-    };
-
     let appState = { asesores: [], reportes: [], session: null, charts: { monthly: null, advisor: null, type: null } };
 
     function parseAdvisorRecord(rawAdv) {
@@ -700,20 +704,20 @@
 
     function loadCache() {
       try {
-        const cached = localStorage.getItem('elite_comercial_cache_v3');
+        const cached = localStorage.getItem('elite_comercial_cache_v4'); // Incrementado versión cache
         if (cached) { const p = JSON.parse(cached); appState.asesores = p.asesores || []; appState.reportes = p.reportes || []; }
       } catch (e) {}
     }
 
     function saveCache() {
-      try { localStorage.setItem('elite_comercial_cache_v3', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
+      try { localStorage.setItem('elite_comercial_cache_v4', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
     }
 
     function updateConnectionIndicator() {
       const badge = document.getElementById('connection-status-badge');
       const url = getScriptUrl();
       if (url && url.startsWith('https://script.google.com/')) {
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-emerald-700 font-semibold">Conectado a Google Sheets</span>`;
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-emerald-700 font-semibold">Conectado</span>`;
       } else {
         badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span><span class="text-amber-700">Modo Local</span>`;
       }
@@ -770,7 +774,6 @@
       const inputPass = document.getElementById('advisor-pass-input').value.trim();
       const btn = document.getElementById('advisor-login-btn');
       btn.disabled = true; await syncWithSheets(false); btn.disabled = false;
-
       const foundRaw = appState.asesores.find(a => String(a.phone).replace(/\D/g, '') === rawPhone);
       if (!foundRaw) { showToast('Celular no registrado.', 'error'); return; }
       const parsedAdv = parseAdvisorRecord(foundRaw);
@@ -793,7 +796,6 @@
       e.preventDefault();
       const u = document.getElementById('admin-user-input').value.trim();
       const p = document.getElementById('admin-pass-input').value.trim();
-
       if (u === CONFIG.ADMIN_USER && p === CONFIG.ADMIN_PASS) {
         appState.session = { role: 'admin' };
         document.getElementById('login-view').classList.add('hidden');
@@ -801,12 +803,11 @@
         document.getElementById('advisor-dashboard').classList.add('hidden');
         document.getElementById('admin-dashboard').classList.remove('hidden');
         document.getElementById('nav-user-subtitle').textContent = 'Dirección Comercial';
-        
         renderAdminDashboard();
         lucide.createIcons();
         await syncWithSheets(false);
       } else {
-        showToast('Credenciales de administrador incorrectas.', 'error');
+        showToast('Credenciales incorrectas.', 'error');
       }
     }
 
@@ -823,24 +824,20 @@
       lucide.createIcons();
     }
 
-    // PANEL ASESOR
+    // --- LÓGICA PANEL ASESOR ---
     function renderAdvisorDashboard() {
       const phone = String(appState.session.phone).replace(/\D/g, '');
       const rawAdv = appState.asesores.find(a => String(a.phone).replace(/\D/g, '') === phone) || { phone, name: appState.session.name };
       const advisor = parseAdvisorRecord(rawAdv);
-
       const metaMes = advisor.metaMensual > 1000 ? CONFIG.DEFAULT_META_MENSUAL : (advisor.metaMensual || CONFIG.DEFAULT_META_MENSUAL);
       const metaConv = advisor.metaConvencion > 10000 ? CONFIG.DEFAULT_META_CONVENCION : (advisor.metaConvencion || CONFIG.DEFAULT_META_CONVENCION);
       const metaBono = CONFIG.META_BONO_TRIMESTRAL;
-
       const now = new Date();
       const curYear = String(now.getFullYear());
       const curMonth = now.getMonth() + 1;
       const curQuarter = getQuarterFromMonth(curMonth);
-
       document.getElementById('adv-quarter-label').textContent = `Trimestre Actual: ${curQuarter}`;
       const myReports = appState.reportes.filter(r => String(r.phone).replace(/\D/g, '') === phone);
-
       let monthSales = 0, yearSales = 0, quarterSales = 0;
       myReports.forEach(r => {
         const parts = String(r.fecha || '').split('-');
@@ -850,39 +847,43 @@
           if (isMonthInQuarter(Number(parts[1]), curQuarter)) quarterSales += Number(r.polizas) || 1;
         }
       });
-
-      // Convención Dinámica
+      // Actualizar Convención
       document.getElementById('adv-conv-target-num').textContent = metaConv;
       document.getElementById('adv-year-sales').textContent = yearSales;
       const convPct = Math.min(100, Math.round((yearSales / metaConv) * 100));
       document.getElementById('adv-conv-pct').textContent = `${convPct}%`;
       document.getElementById('adv-conv-bar').style.width = `${convPct}%`;
       document.getElementById('adv-conv-status').textContent = yearSales >= metaConv ? '¡Meta Cumplida!' : `${metaConv - yearSales} para el viaje`;
-
-      // Bono Trimestral
+      // Actualizar Bono (Lógica visual nueva)
       document.getElementById('adv-quarter-sales').textContent = quarterSales;
       const bonusPct = Math.min(100, Math.round((quarterSales / metaBono) * 100));
       document.getElementById('adv-bonus-bar').style.width = `${bonusPct}%`;
       const bonusBadge = document.getElementById('adv-bonus-badge');
       const bonusMsg = document.getElementById('adv-bonus-msg');
+      const bonusCard = document.getElementById('adv-bonus-card');
+      const bonusValueBox = document.getElementById('adv-bonus-value-box');
+      document.getElementById('adv-bonus-amount').textContent = CONFIG.VALOR_BONO_TRIMESTRAL;
       if (quarterSales >= metaBono) {
         bonusBadge.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white";
         bonusBadge.textContent = "¡CALIFICADO!";
-        bonusMsg.textContent = "Superaste las 11 ventas y aseguras tu bono trimestral.";
+        bonusMsg.classList.add('hidden');
+        bonusValueBox.classList.remove('hidden');
+        bonusCard.classList.add('monetary-glow');
       } else {
-        bonusBadge.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800";
+        bonusBadge.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800";
         bonusBadge.textContent = `${bonusPct}% completado`;
+        bonusMsg.classList.remove('hidden');
         bonusMsg.textContent = `Te faltan ${metaBono - quarterSales} ventas para el bono.`;
+        bonusValueBox.classList.add('hidden');
+        bonusCard.classList.remove('monetary-glow');
       }
-
       document.getElementById('adv-month-sales').textContent = monthSales;
       document.getElementById('adv-month-target').textContent = metaMes;
-
-      // Tabla Historial con botón Eliminar
+      // Tabla Historial
       document.getElementById('adv-history-count').textContent = `${myReports.length} registros`;
       const tbody = document.getElementById('adv-reports-tbody');
       if (myReports.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">Sin registros de ventas aún.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">Sin registros aún.</td></tr>`;
       } else {
         tbody.innerHTML = [...myReports].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))).map(r => `
           <tr class="hover:bg-slate-50/80">
@@ -918,27 +919,23 @@
         if (res && res.status === 'ok' && res.data) { appState.asesores = res.data.asesores; appState.reportes = res.data.reportes; }
         else { appState.reportes.push(newRep); }
         saveCache(); document.getElementById('rep-cliente').value = ''; document.getElementById('rep-polizas').value = '1';
-        renderAdvisorDashboard(); showToast('¡Venta registrada con éxito!');
+        renderAdvisorDashboard(); showToast('Venta registrada.');
       } catch (err) { appState.reportes.push(newRep); saveCache(); renderAdvisorDashboard(); showToast('Guardado localmente.', 'warning'); }
       finally { btn.disabled = false; }
     }
 
-    // PANEL ADMINISTRADOR
+    // --- LÓGICA PANEL DIRECTOR ---
     function renderAdminDashboard() {
       const selYear = document.getElementById('filter-year').value;
       const selMonth = document.getElementById('filter-month').value;
       const selQuarter = document.getElementById('filter-quarter').value;
       const metaBono = CONFIG.META_BONO_TRIMESTRAL;
-
       const quarterBadge = document.getElementById('chart-quarter-badge');
-      if (quarterBadge) quarterBadge.textContent = selQuarter;
-
+      if(quarterBadge) quarterBadge.textContent = selQuarter;
       const yearReports = appState.reportes.filter(r => String(r.fecha || '').startsWith(selYear));
       const periodReports = selMonth === 'ALL' ? yearReports : yearReports.filter(r => String(r.fecha || '').split('-')[1] === selMonth);
-
       let totalVentas = 0, totalFam = 0, totalOtros = 0;
       const monthlyFam = new Array(12).fill(0), monthlyOtros = new Array(12).fill(0);
-
       yearReports.forEach(r => {
         const m = Number(String(r.fecha || '').split('-')[1] || 0) - 1;
         const qty = Number(r.polizas) || 1;
@@ -946,19 +943,16 @@
           if (isFamiliarType(parseTipoVenta(r))) monthlyFam[m] += qty; else monthlyOtros[m] += qty;
         }
       });
-
       periodReports.forEach(r => {
         const qty = Number(r.polizas) || 1;
         totalVentas += qty;
         if (isFamiliarType(parseTipoVenta(r))) totalFam += qty; else totalOtros += qty;
       });
-
       const advisorMap = {};
       appState.asesores.forEach(rawA => {
         const p = parseAdvisorRecord(rawA);
         advisorMap[p.phone] = { phone: p.phone, name: p.cleanName, password: p.password, ventasPeriodo: 0, ventasTrimestre: 0 };
       });
-
       yearReports.forEach(r => {
         const p = String(r.phone).replace(/\D/g, '');
         if (!advisorMap[p]) advisorMap[p] = { phone: p, name: cleanAdvisorDisplay(r.asesor), password: '1234', ventasPeriodo: 0, ventasTrimestre: 0 };
@@ -967,12 +961,10 @@
         if (isMonthInQuarter(m, selQuarter)) advisorMap[p].ventasTrimestre += qty;
         if (selMonth === 'ALL' || String(r.fecha).split('-')[1] === selMonth) advisorMap[p].ventasPeriodo += qty;
       });
-
       const advisorList = Object.values(advisorMap).sort((a, b) => b.ventasPeriodo - a.ventasPeriodo);
       document.getElementById('kpi-total-ventas').textContent = totalVentas;
       document.getElementById('kpi-bonus-qualified').textContent = advisorList.filter(a => a.ventasTrimestre >= metaBono).length;
       document.getElementById('kpi-total-advisors').textContent = advisorList.length;
-
       if (advisorList.length > 0 && advisorList[0].ventasPeriodo > 0) {
         document.getElementById('kpi-top-advisor').textContent = advisorList[0].name;
         document.getElementById('kpi-top-advisor-sales').textContent = `${advisorList[0].ventasPeriodo} ventas`;
@@ -980,12 +972,10 @@
         document.getElementById('kpi-top-advisor').textContent = 'Sin registros';
         document.getElementById('kpi-top-advisor-sales').textContent = '0 ventas';
       }
-
       document.getElementById('chart-legend-familiar').textContent = totalFam;
       document.getElementById('chart-legend-usuario').textContent = totalOtros;
       renderAdminCharts(monthlyOtros, monthlyFam, advisorList, metaBono, totalOtros, totalFam);
-
-      // Tabla de Asesores
+      // Tabla Ranking
       document.getElementById('admin-ranking-tbody').innerHTML = advisorList.length === 0 ? `<tr><td colspan="6" class="py-6 text-center text-slate-400">Sin asesores</td></tr>` : advisorList.map((a, idx) => `
         <tr class="hover:bg-slate-50/80">
           <td class="py-3 px-2"><span class="font-bold text-slate-900">${a.name}</span><span class="block text-[11px] text-slate-400">${a.phone}</span></td>
@@ -993,11 +983,10 @@
           <td class="py-3 px-2 text-center font-bold">${a.ventasPeriodo}</td>
           <td class="py-3 px-2 text-center font-bold ${a.ventasTrimestre >= metaBono ? 'text-emerald-600' : ''}">${a.ventasTrimestre} / ${metaBono}</td>
           <td class="py-3 px-2">${a.ventasTrimestre >= metaBono ? '<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Califica</span>' : '<span class="text-slate-500 text-xs">En proceso</span>'}</td>
-          <td class="py-3 px-2 text-right"><button onclick="openEditAdvisorModal('${a.phone}')" class="px-2 py-1 rounded bg-slate-100 text-xs font-semibold">Editar ✎</button></td>
+          <td class="py-3 px-2 text-right"><button onclick="openEditAdvisorModal('${a.phone}')" class="px-2 py-1 rounded bg-slate-100 text-xs font-semibold">Editar</button></td>
         </tr>
       `).join('');
-
-      // Tabla Movimientos Director
+      // Tabla Movimientos
       document.getElementById('admin-movements-count').textContent = `${periodReports.length} movimientos`;
       document.getElementById('admin-reports-tbody').innerHTML = periodReports.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-slate-400">Sin movimientos</td></tr>` : periodReports.map(r => `
         <tr class="hover:bg-slate-50/80">
@@ -1016,17 +1005,15 @@
       if (appState.charts.monthly) appState.charts.monthly.destroy();
       appState.charts.monthly = new Chart(document.getElementById('monthlyChart').getContext('2d'), {
         type: 'bar',
-        data: { labels: MONTH_NAMES, datasets: [{ label: 'Familiar', data: monthlyFam, backgroundColor: '#6366f1', borderRadius: 6 }, { label: 'Otros', data: monthlyOtros, backgroundColor: '#10b981', borderRadius: 6 }] },
+        data: { labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"], datasets: [{ label: 'Familiar', data: monthlyFam, backgroundColor: '#6366f1', borderRadius: 6 }, { label: 'Otros', data: monthlyOtros, backgroundColor: '#10b981', borderRadius: 6 }] },
         options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } } }
       });
-
       if (appState.charts.advisor) appState.charts.advisor.destroy();
       appState.charts.advisor = new Chart(document.getElementById('advisorComplianceChart').getContext('2d'), {
         type: 'bar',
         data: { labels: advisorList.slice(0, 10).map(a => a.name.split(' ')[0]), datasets: [{ data: advisorList.slice(0, 10).map(a => a.ventasTrimestre), backgroundColor: '#10b981', borderRadius: 6 }] },
         options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { stepSize: 2 } }, y: { grid: { display: false } } } }
       });
-
       if (appState.charts.type) appState.charts.type.destroy();
       appState.charts.type = new Chart(document.getElementById('typeChart').getContext('2d'), {
         type: 'doughnut',
@@ -1035,8 +1022,9 @@
       });
     }
 
+    // --- UTILIDADES GENERALES ---
     async function deleteReport(id) {
-      if (!confirm('¿Seguro deseas eliminar este registro?')) return;
+      if (!confirm('¿Eliminar este registro?')) return;
       try {
         const res = await apiCall({ action: 'delete_report', id });
         if (res && res.status === 'ok' && res.data) { appState.asesores = res.data.asesores; appState.reportes = res.data.reportes; }
@@ -1046,14 +1034,13 @@
     }
 
     function openCreateAdvisorModal() {
-      document.getElementById('advisor-modal-title').textContent = 'Registrar Nuevo Asesor';
+      document.getElementById('advisor-modal-title').textContent = 'Registrar Asesor';
       document.getElementById('adv-form-mode').value = 'create';
       document.getElementById('adv-form-name').value = '';
       const pInput = document.getElementById('adv-form-phone'); pInput.value = ''; pInput.readOnly = false;
       document.getElementById('adv-form-pass').value = '';
       document.getElementById('advisor-form-modal').classList.remove('hidden'); document.getElementById('advisor-form-modal').classList.add('flex');
     }
-
     function openEditAdvisorModal(phone) {
       const raw = appState.asesores.find(a => String(a.phone).replace(/\D/g, '') === phone);
       if (!raw) return;
@@ -1065,20 +1052,23 @@
       document.getElementById('adv-form-pass').value = parsed.password;
       document.getElementById('advisor-form-modal').classList.remove('hidden'); document.getElementById('advisor-form-modal').classList.add('flex');
     }
-
     function closeAdvisorFormModal() { document.getElementById('advisor-form-modal').classList.add('hidden'); document.getElementById('advisor-form-modal').classList.remove('flex'); }
 
     async function saveAdvisorForm(e) {
       e.preventDefault();
       const mode = document.getElementById('adv-form-mode').value;
       const phone = document.getElementById('adv-form-phone').value.replace(/\D/g, '');
-      const encoded = encodeAdvisorNameWithPass(document.getElementById('adv-form-name').value.trim(), document.getElementById('adv-form-pass').value.trim());
+      const name = document.getElementById('adv-form-name').value.trim();
+      const pass = document.getElementById('adv-form-pass').value.trim();
+      const mens = Number(document.getElementById('adv-form-mensual').value);
+      const conv = Number(document.getElementById('adv-form-convencion').value);
+      const encoded = encodeAdvisorNameWithPass(name, pass);
       try {
-        const res = await apiCall({ action: mode === 'create' ? 'register_advisor' : 'update_advisor', phone, name: encoded, metaMensual: 5, metaConvencion: 45 });
+        const res = await apiCall({ action: mode === 'create' ? 'register_advisor' : 'update_advisor', phone, name: encoded, metaMensual: mens, metaConvencion: conv });
         if (res && res.status === 'ok' && res.data) { appState.asesores = res.data.asesores; appState.reportes = res.data.reportes; }
-        else if (mode === 'create') { appState.asesores.push({ phone, name: encoded }); }
-        else { const idx = appState.asesores.findIndex(a => String(a.phone).replace(/\D/g, '') === phone); if (idx > -1) appState.asesores[idx] = { phone, name: encoded }; }
-        saveCache(); closeAdvisorFormModal(); renderAdminDashboard(); showToast('Asesor guardado correctamente.');
+        else if (mode === 'create') { appState.asesores.push({ phone, name: encoded, metaMensual: mens, metaConvencion: conv }); }
+        else { const idx = appState.asesores.findIndex(a => String(a.phone).replace(/\D/g, '') === phone); if (idx > -1) appState.asesores[idx] = { phone, name: encoded, metaMensual: mens, metaConvencion: conv }; }
+        saveCache(); closeAdvisorFormModal(); refreshActiveView(); showToast('Asesor guardado.');
       } catch (err) { showToast('Error al guardar.', 'error'); }
     }
 
@@ -1091,8 +1081,8 @@
     function exportReportsCSV() {
       const csv = '\uFEFF' + ['Fecha,Asesor,Cliente,Tipo,Producto,Ventas'].join(',') + '\n' + appState.reportes.map(r => `${r.fecha},"${cleanAdvisorDisplay(r.asesor)}","${r.cliente}",${parseTipoVenta(r)},"${cleanProductoName(r)}",${r.polizas || 1}`).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Consolidado_${new Date().toISOString().slice(0,10)}.csv`;
-      document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('Descargado con éxito.');
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Reportes_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('Descargado.');
     }
   </script>
 </body>
