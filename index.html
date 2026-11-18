@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -930,8 +930,8 @@
       const selQuarter = document.getElementById('filter-quarter').value;
       const metaBono = CONFIG.META_BONO_TRIMESTRAL;
 
-      document.getElementById('chart-year-label').textContent = selYear;
-      document.getElementById('chart-quarter-badge').textContent = selQuarter;
+      const quarterBadge = document.getElementById('chart-quarter-badge');
+      if (quarterBadge) quarterBadge.textContent = selQuarter;
 
       const yearReports = appState.reportes.filter(r => String(r.fecha || '').startsWith(selYear));
       const periodReports = selMonth === 'ALL' ? yearReports : yearReports.filter(r => String(r.fecha || '').split('-')[1] === selMonth);
