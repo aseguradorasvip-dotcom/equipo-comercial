@@ -14,9 +14,9 @@
     .navy-gradient { background: linear-gradient(135deg, #090d16 0%, #0f172a 55%, #1e293b 100%); }
     .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
     .card-shadow { box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06); }
-    
+
     .istanbul-bg {
-      background-image: linear-gradient(to bottom, rgba(9, 13, 22, 0.6), rgba(15, 23, 42, 0.85)), 
+      background-image: linear-gradient(to bottom, rgba(9, 13, 22, 0.6), rgba(15, 23, 42, 0.85)),
                         url('https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?q=80&w=1200');
       background-size: cover;
       background-position: center;
@@ -163,9 +163,9 @@
 
     <!-- VISTA A: PANEL DEL ASESOR -->
     <div id="advisor-dashboard" class="max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 hidden">
-      
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
+
         <!-- TARJETA CONVENCIÓN (ESTAMBUL) -->
         <div class="lg:col-span-7 istanbul-bg rounded-3xl p-6 text-white shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[200px]">
           <div class="z-10">
@@ -248,7 +248,7 @@
 
       <!-- Formulario y Mis Ventas -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
+
         <!-- Formulario -->
         <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 card-shadow h-fit">
           <div class="flex items-center gap-2.5 mb-5">
@@ -307,6 +307,7 @@
                 <select id="rep-ramo" onchange="toggleAmbulatoriaHint()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   <option value="Plan Alterno">Plan Alterno</option>
                   <option value="Plan Original">Plan Original</option>
+                  <option value="Plan Ambulatorio">Plan Ambulatorio</option>
                   <option value="Póliza Ambulatoria">Póliza Ambulatoria</option>
                   <option value="Emermédica">Emermédica</option>
                   <option value="Salud Express">Salud Express</option>
@@ -320,10 +321,9 @@
               </div>
             </div>
 
-            <!-- Aviso visual de equivalencia para Póliza Ambulatoria -->
             <div id="ambulatoria-hint" class="hidden p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-medium flex items-center gap-2">
               <i data-lucide="info" class="w-4 h-4 shrink-0 text-amber-600"></i>
-              <span><strong>Regla Ambulatoria:</strong> Cada póliza equivale a <strong>0.33</strong> afiliaciones (3 pólizas = 1 afiliación).</span>
+              <span><strong>Regla Ambulatoria activa:</strong> Cada unidad equivale a <strong>0.33</strong> afiliaciones (3 unidades = 1 afiliación).</span>
             </div>
 
             <div>
@@ -342,7 +342,7 @@
           <div class="flex items-center justify-between mb-4">
             <div>
               <h3 class="font-display font-bold text-lg text-slate-900">Mis Ventas Reportadas</h3>
-              <p class="text-xs text-slate-500">Puedes eliminar cualquier registro si cometiste un error</p>
+              <p class="text-xs text-slate-500">Ambulatoria suma 0.33 por unidad (3 = 1 afiliación)</p>
             </div>
             <span id="adv-history-count" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">0 registros</span>
           </div>
@@ -355,7 +355,7 @@
                   <th class="py-3 px-2">Cliente</th>
                   <th class="py-3 px-2">Tipo</th>
                   <th class="py-3 px-2">Producto</th>
-                  <th class="py-3 px-2 text-center">Pól. / Equiv.</th>
+                  <th class="py-3 px-2 text-center">Cant. / Equiv.</th>
                   <th class="py-3 px-2 text-right">Borrar</th>
                 </tr>
               </thead>
@@ -369,11 +369,11 @@
 
     <!-- VISTA B: PANEL DEL DIRECTOR / ADMINISTRADOR -->
     <div id="admin-dashboard" class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 hidden">
-      
+
       <div class="bg-white rounded-3xl p-5 border border-slate-100 card-shadow flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <h1 class="font-display font-bold text-xl sm:text-2xl text-slate-900">Tablero de Dirección Comercial</h1>
-          <p class="text-xs sm:text-sm text-slate-500">Gestión integral, Bolsa Millonaria, Convención Anual y Bonos (Póliza Ambulatoria = 0.33).</p>
+          <p class="text-xs sm:text-sm text-slate-500">Gestión integral, Bolsa Millonaria, Convención Anual y Bonos (Ambulatoria = 0.33).</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
@@ -552,7 +552,7 @@
                 <th class="py-3 px-2">Cliente</th>
                 <th class="py-3 px-2">Tipo Venta</th>
                 <th class="py-3 px-2">Producto</th>
-                <th class="py-3 px-2 text-center">Pól. / Equiv.</th>
+                <th class="py-3 px-2 text-center">Cant. / Equiv.</th>
                 <th class="py-3 px-2 text-right">Acción</th>
               </tr>
             </thead>
@@ -629,15 +629,24 @@
     const MONTH_NAMES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
     let appState = { asesores: [], reportes: [], session: null, charts: { monthly: null, advisor: null, type: null } };
 
-    // --- NUEVA FUNCIÓN DE PONDERACIÓN DE PÓLIZA AMBULATORIA (0.33) ---
+    // Normaliza texto para ignorar tildes y mayúsculas
+    function normalizeText(str) {
+      return String(str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+    }
+
+    // Detecta "plan ambulatorio", "poliza ambulatoria" o cualquier mención a ambulatoria
     function isAmbulatoriaReport(rep) {
-      return /ambulatoria/i.test(String(rep.ramo || ''));
+      const combined = `${normalizeText(rep.ramo)} ${normalizeText(rep.tipoVenta)}`;
+      return combined.includes('ambulatori');
     }
 
     function getEffectiveSales(rep) {
       const qty = Number(rep.polizas) || 1;
       if (isAmbulatoriaReport(rep)) {
-        // Si es múltiplo exacto de 3 (ej. 3, 6, 9), equivale a 1, 2, 3 enteros exactos; si no, 0.33 por unidad
         if (qty % 3 === 0) return qty / 3;
         return Number((qty * 0.33).toFixed(2));
       }
@@ -645,14 +654,19 @@
     }
 
     function formatScore(num) {
-      // Muestra entero si no tiene decimales, o máximo 2 decimales limpios (ej. 10.33)
       return Number(Number(num || 0).toFixed(2));
+    }
+
+    function fixTriples(val) {
+      const frac = Number((val % 1).toFixed(2));
+      if (frac === 0.99) return Math.round(val);
+      return formatScore(val);
     }
 
     function toggleAmbulatoriaHint() {
       const val = document.getElementById('rep-ramo').value;
       const hint = document.getElementById('ambulatoria-hint');
-      if (/ambulatoria/i.test(val)) {
+      if (normalizeText(val).includes('ambulatori')) {
         hint.classList.remove('hidden');
       } else {
         hint.classList.add('hidden');
@@ -677,7 +691,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('login-brand-name').textContent = CONFIG.COMPANY_NAME.toUpperCase();
       document.getElementById('nav-brand-name').textContent = CONFIG.COMPANY_NAME.toUpperCase();
-      
+
       const now = new Date();
       const yyyy = String(now.getFullYear());
       const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -686,6 +700,7 @@
 
       loadCache();
       updateConnectionIndicator();
+      toggleAmbulatoriaHint();
       lucide.createIcons();
       if (getScriptUrl()) await syncWithSheets(false);
     });
@@ -738,13 +753,13 @@
 
     function loadCache() {
       try {
-        const cached = localStorage.getItem('elite_comercial_cache_v5');
+        const cached = localStorage.getItem('elite_comercial_cache_v6');
         if (cached) { const p = JSON.parse(cached); appState.asesores = p.asesores || []; appState.reportes = p.reportes || []; }
       } catch (e) {}
     }
 
     function saveCache() {
-      try { localStorage.setItem('elite_comercial_cache_v5', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
+      try { localStorage.setItem('elite_comercial_cache_v6', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
     }
 
     function updateConnectionIndicator() {
@@ -884,13 +899,6 @@
         }
       });
 
-      // Ajuste si la suma de varias filas de ambulatorias da .99 (ej. 3 registros separados de 1 ambulatoria = 0.99 -> 1.0)
-      const fixTriples = (val) => {
-        const frac = Number((val % 1).toFixed(2));
-        if (frac === 0.99) return Math.round(val);
-        return formatScore(val);
-      };
-
       yearSales = fixTriples(yearSales);
       monthSales = fixTriples(monthSales);
       quarterSales = fixTriples(quarterSales);
@@ -937,15 +945,16 @@
         tbody.innerHTML = [...myReports].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))).map(r => {
           const rawQty = Number(r.polizas) || 1;
           const effQty = getEffectiveSales(r);
-          const qtyDisplay = isAmbulatoriaReport(r)
-            ? `<span class="font-bold text-slate-900">${rawQty}</span> <span class="text-[11px] text-amber-700 font-semibold">(${effQty})</span>`
+          const isAmb = isAmbulatoriaReport(r);
+          const qtyDisplay = isAmb
+            ? `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">${effQty}</span>`
             : `<span class="font-bold text-slate-900">${rawQty}</span>`;
           return `
           <tr class="hover:bg-slate-50/80">
             <td class="py-3 px-2 text-xs text-slate-500">${r.fecha}</td>
             <td class="py-3 px-2 font-semibold text-slate-800 text-xs">${r.cliente}</td>
             <td class="py-3 px-2">${getTipoBadgeHtml(parseTipoVenta(r))}</td>
-            <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)}</td>
+            <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)} ${isAmb ? '<span class="text-[10px] font-bold text-amber-700">(0.33 c/u)</span>' : ''}</td>
             <td class="py-3 px-2 text-center">${qtyDisplay}</td>
             <td class="py-3 px-2 text-right">
               <button onclick="deleteReport('${r.id}')" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -990,12 +999,6 @@
       if(quarterBadge) quarterBadge.textContent = selQuarter;
       const yearReports = appState.reportes.filter(r => String(r.fecha || '').startsWith(selYear));
       const periodReports = selMonth === 'ALL' ? yearReports : yearReports.filter(r => String(r.fecha || '').split('-')[1] === selMonth);
-
-      const fixTriples = (val) => {
-        const frac = Number((val % 1).toFixed(2));
-        if (frac === 0.99) return Math.round(val);
-        return formatScore(val);
-      };
 
       let totalVentas = 0, totalFam = 0, totalOtros = 0;
       const monthlyFam = new Array(12).fill(0), monthlyOtros = new Array(12).fill(0);
@@ -1047,7 +1050,7 @@
       document.getElementById('chart-legend-usuario').textContent = totalOtros;
       renderAdminCharts(monthlyOtros, monthlyFam, advisorList, metaBono, totalOtros, totalFam);
 
-      document.getElementById('admin-ranking-tbody').innerHTML = advisorList.length === 0 ? `<tr><td colspan="6" class="py-6 text-center text-slate-400">Sin asesores</td></tr>` : advisorList.map((a, idx) => `
+      document.getElementById('admin-ranking-tbody').innerHTML = advisorList.length === 0 ? `<tr><td colspan="6" class="py-6 text-center text-slate-400">Sin asesores</td></tr>` : advisorList.map((a) => `
         <tr class="hover:bg-slate-50/80">
           <td class="py-3 px-2"><span class="font-bold text-slate-900">${a.name}</span><span class="block text-[11px] text-slate-400">${a.phone}</span></td>
           <td class="py-3 px-2 text-center"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-900 font-mono text-xs font-bold">${a.password}</span></td>
@@ -1062,8 +1065,9 @@
       document.getElementById('admin-reports-tbody').innerHTML = periodReports.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-slate-400">Sin movimientos</td></tr>` : periodReports.map(r => {
         const rawQty = Number(r.polizas) || 1;
         const effQty = getEffectiveSales(r);
-        const qtyDisplay = isAmbulatoriaReport(r)
-          ? `<span class="font-bold text-slate-900">${rawQty}</span> <span class="text-[11px] text-amber-700 font-semibold">(${effQty})</span>`
+        const isAmb = isAmbulatoriaReport(r);
+        const qtyDisplay = isAmb
+          ? `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">${effQty}</span>`
           : `<span class="font-bold text-slate-900">${rawQty}</span>`;
         return `
         <tr class="hover:bg-slate-50/80">
@@ -1071,7 +1075,7 @@
           <td class="py-3 px-2 font-semibold text-slate-800 text-xs">${cleanAdvisorDisplay(r.asesor)}</td>
           <td class="py-3 px-2 text-xs">${r.cliente}</td>
           <td class="py-3 px-2">${getTipoBadgeHtml(parseTipoVenta(r))}</td>
-          <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)}</td>
+          <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)} ${isAmb ? '<span class="text-[10px] font-bold text-amber-700">(0.33 c/u)</span>' : ''}</td>
           <td class="py-3 px-2 text-center">${qtyDisplay}</td>
           <td class="py-3 px-2 text-right"><button onclick="deleteReport('${r.id}')" class="p-1 rounded text-rose-500 hover:bg-rose-50"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
         </tr>
