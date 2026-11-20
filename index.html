@@ -216,18 +216,34 @@
 
       </div>
 
-      <!-- KPIs Secundarios -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- KPIs Secundarios (3 columnas: Mes Principal, Emermédica/Salud Express aparte, Bolsa Millonaria) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow flex items-center justify-between">
           <div>
-            <span class="text-xs font-semibold text-slate-400 uppercase">Afiliaciones del Mes Actual</span>
+            <span class="text-xs font-semibold text-slate-400 uppercase">Afiliaciones del Mes</span>
             <div class="mt-1 flex items-baseline gap-2">
               <span id="adv-month-sales" class="font-display font-extrabold text-3xl text-slate-900">0</span>
               <span class="text-xs text-slate-500">meta: <span id="adv-month-target">5</span></span>
             </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Planes principales y ambulatoria</p>
           </div>
-          <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <i data-lucide="calendar" class="w-6 h-6"></i>
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <!-- NUEVO CONTADOR APARTE: EMERMÉDICA & SALUD EXPRESS -->
+        <div class="bg-white rounded-2xl p-5 border border-sky-100 card-shadow flex items-center justify-between">
+          <div>
+            <span class="text-xs font-semibold text-sky-700 uppercase">Emermédica & Salud Express</span>
+            <div class="mt-1 flex items-baseline gap-2">
+              <span id="adv-comp-year-sales" class="font-display font-extrabold text-3xl text-sky-900">0</span>
+              <span class="text-xs text-slate-500">año (<strong id="adv-comp-month-sales" class="text-sky-700">0</strong> mes)</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-0.5">Contador independiente (no suma a meta)</p>
+          </div>
+          <div class="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+            <i data-lucide="heart-pulse" class="w-5 h-5"></i>
           </div>
         </div>
 
@@ -240,8 +256,8 @@
             </div>
             <p class="text-[11px] text-slate-500 mt-0.5">Participación por cumplimiento colectivo.</p>
           </div>
-          <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
-            <i data-lucide="sparkles" class="w-6 h-6"></i>
+          <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
           </div>
         </div>
       </div>
@@ -304,7 +320,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Producto / Ramo *</label>
-                <select id="rep-ramo" onchange="toggleAmbulatoriaHint()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <select id="rep-ramo" onchange="toggleProductHint()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   <option value="Plan Alterno">Plan Alterno</option>
                   <option value="Plan Original">Plan Original</option>
                   <option value="Plan Ambulatorio">Plan Ambulatorio</option>
@@ -321,9 +337,16 @@
               </div>
             </div>
 
+            <!-- Aviso regla Ambulatoria -->
             <div id="ambulatoria-hint" class="hidden p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-medium flex items-center gap-2">
               <i data-lucide="info" class="w-4 h-4 shrink-0 text-amber-600"></i>
               <span><strong>Regla Ambulatoria activa:</strong> Cada unidad equivale a <strong>0.33</strong> afiliaciones (3 unidades = 1 afiliación).</span>
+            </div>
+
+            <!-- Aviso regla Emermédica / Salud Express -->
+            <div id="complementary-hint" class="hidden p-2.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-900 text-[11px] font-medium flex items-center gap-2">
+              <i data-lucide="heart-pulse" class="w-4 h-4 shrink-0 text-sky-600"></i>
+              <span><strong>Contador Independiente:</strong> Este producto se registra en tu indicador de <strong>Emermédica & Salud Express</strong> y no suma a la Convención ni al Bono Trimestral.</span>
             </div>
 
             <div>
@@ -342,7 +365,7 @@
           <div class="flex items-center justify-between mb-4">
             <div>
               <h3 class="font-display font-bold text-lg text-slate-900">Mis Ventas Reportadas</h3>
-              <p class="text-xs text-slate-500">Ambulatoria suma 0.33 por unidad (3 = 1 afiliación)</p>
+              <p class="text-xs text-slate-500">Ambulatoria = 0.33 · Emermédica/Salud Express = Contador aparte</p>
             </div>
             <span id="adv-history-count" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">0 registros</span>
           </div>
@@ -373,7 +396,7 @@
       <div class="bg-white rounded-3xl p-5 border border-slate-100 card-shadow flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <h1 class="font-display font-bold text-xl sm:text-2xl text-slate-900">Tablero de Dirección Comercial</h1>
-          <p class="text-xs sm:text-sm text-slate-500">Gestión integral, Bolsa Millonaria, Convención Anual y Bonos (Ambulatoria = 0.33).</p>
+          <p class="text-xs sm:text-sm text-slate-500">Convención y Bonos (Planes principales + Ambulatoria 0.33) · Emermédica y Salud Express en contador aparte.</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
@@ -426,27 +449,28 @@
         </div>
       </div>
 
+      <!-- KPIs Dirección (4 columnas) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
           <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Afiliaciones Efectivas</span>
+            <span>Afiliaciones Meta</span>
             <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <i data-lucide="trending-up" class="w-4 h-4"></i>
             </div>
           </div>
           <p id="kpi-total-ventas" class="font-display font-extrabold text-3xl text-slate-900 mt-2">0</p>
-          <p id="kpi-periodo-desc" class="text-xs text-slate-500 mt-1">Con equivalencia aplicada</p>
+          <p id="kpi-periodo-desc" class="text-xs text-slate-500 mt-1">Válidas para Convención y Bono</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
-          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Bolsa Millonaria</span>
-            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-              <i data-lucide="sparkles" class="w-4 h-4"></i>
+        <div class="bg-white rounded-2xl p-5 border border-sky-100 card-shadow">
+          <div class="flex items-center justify-between text-sky-700 text-xs font-semibold uppercase">
+            <span>Emermédica & Salud Exp.</span>
+            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+              <i data-lucide="heart-pulse" class="w-4 h-4"></i>
             </div>
           </div>
-          <p class="font-display font-extrabold text-2xl text-amber-600 mt-2">Activa</p>
-          <p class="text-xs text-slate-500 mt-1">Fondo de incentivos equipo</p>
+          <p id="kpi-total-complementary" class="font-display font-extrabold text-3xl text-sky-900 mt-2">0</p>
+          <p class="text-xs text-slate-500 mt-1">Contador independiente periodo</p>
         </div>
 
         <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
@@ -476,8 +500,8 @@
         <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Movimiento Mensual</h2>
-              <p class="text-xs text-slate-500">Historial anual de cierres efectivos</p>
+              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Movimiento Mensual (Metas)</h2>
+              <p class="text-xs text-slate-500">Historial anual de cierres válidos para convención/bono</p>
             </div>
             <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold">Anual</span>
           </div>
@@ -500,7 +524,7 @@
         <div class="lg:col-span-4 bg-white rounded-3xl p-6 border border-slate-100 card-shadow flex flex-col justify-between">
           <div>
             <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Modalidad de Venta</h2>
-            <p class="text-xs text-slate-500">Distribución global del equipo</p>
+            <p class="text-xs text-slate-500">Distribución planes principales</p>
           </div>
           <div class="h-56 my-auto py-2"><canvas id="typeChart"></canvas></div>
           <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-center text-xs">
@@ -513,7 +537,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
               <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Equipo Comercial & Bonos</h2>
-              <p class="text-xs text-slate-500">Gestión de credenciales y estado de bono</p>
+              <p class="text-xs text-slate-500">Gestión de credenciales, metas y contador Emermédica/Salud Express</p>
             </div>
             <button onclick="openCreateAdvisorModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition self-start">+ Nuevo Asesor</button>
           </div>
@@ -523,7 +547,8 @@
                 <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   <th class="py-3 px-2">Asesor</th>
                   <th class="py-3 px-2 text-center">Clave</th>
-                  <th class="py-3 px-2 text-center">Periodo</th>
+                  <th class="py-3 px-2 text-center">Meta Per.</th>
+                  <th class="py-3 px-2 text-center text-sky-700">Emer./S.Exp</th>
                   <th class="py-3 px-2 text-center">Trimestre</th>
                   <th class="py-3 px-2">Bono (≥11)</th>
                   <th class="py-3 px-2 text-right">Editar</th>
@@ -629,7 +654,6 @@
     const MONTH_NAMES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
     let appState = { asesores: [], reportes: [], session: null, charts: { monthly: null, advisor: null, type: null } };
 
-    // Normaliza texto para ignorar tildes y mayúsculas
     function normalizeText(str) {
       return String(str || '')
         .normalize('NFD')
@@ -638,19 +662,33 @@
         .trim();
     }
 
-    // Detecta "plan ambulatorio", "poliza ambulatoria" o cualquier mención a ambulatoria
+    // Detecta Emermédica y Salud Express (van a contador aparte, NO suman a Convención ni Bono Trimestral)
+    function isComplementaryReport(rep) {
+      const combined = `${normalizeText(rep.ramo)} ${normalizeText(rep.tipoVenta)}`;
+      return combined.includes('emermedica') || combined.includes('salud express');
+    }
+
+    // Detecta Plan Ambulatorio / Póliza Ambulatoria (equivale a 0.33 por unidad; 3 = 1)
     function isAmbulatoriaReport(rep) {
       const combined = `${normalizeText(rep.ramo)} ${normalizeText(rep.tipoVenta)}`;
       return combined.includes('ambulatori');
     }
 
+    // Devuelve los puntos válidos para Convención Anual, Bono Trimestral y Meta Mensual
     function getEffectiveSales(rep) {
+      if (isComplementaryReport(rep)) return 0; // Emermédica y Salud Express NO suman a metas
       const qty = Number(rep.polizas) || 1;
       if (isAmbulatoriaReport(rep)) {
         if (qty % 3 === 0) return qty / 3;
         return Number((qty * 0.33).toFixed(2));
       }
       return qty;
+    }
+
+    // Devuelve la cantidad vendida si es Emermédica o Salud Express
+    function getComplementarySales(rep) {
+      if (!isComplementaryReport(rep)) return 0;
+      return Number(rep.polizas) || 1;
     }
 
     function formatScore(num) {
@@ -663,13 +701,20 @@
       return formatScore(val);
     }
 
-    function toggleAmbulatoriaHint() {
-      const val = document.getElementById('rep-ramo').value;
-      const hint = document.getElementById('ambulatoria-hint');
-      if (normalizeText(val).includes('ambulatori')) {
-        hint.classList.remove('hidden');
+    function toggleProductHint() {
+      const norm = normalizeText(document.getElementById('rep-ramo').value);
+      const ambHint = document.getElementById('ambulatoria-hint');
+      const compHint = document.getElementById('complementary-hint');
+
+      if (norm.includes('ambulatori')) {
+        ambHint.classList.remove('hidden');
+        compHint.classList.add('hidden');
+      } else if (norm.includes('emermedica') || norm.includes('salud express')) {
+        compHint.classList.remove('hidden');
+        ambHint.classList.add('hidden');
       } else {
-        hint.classList.add('hidden');
+        ambHint.classList.add('hidden');
+        compHint.classList.add('hidden');
       }
     }
 
@@ -700,7 +745,7 @@
 
       loadCache();
       updateConnectionIndicator();
-      toggleAmbulatoriaHint();
+      toggleProductHint();
       lucide.createIcons();
       if (getScriptUrl()) await syncWithSheets(false);
     });
@@ -753,13 +798,13 @@
 
     function loadCache() {
       try {
-        const cached = localStorage.getItem('elite_comercial_cache_v6');
+        const cached = localStorage.getItem('elite_comercial_cache_v7');
         if (cached) { const p = JSON.parse(cached); appState.asesores = p.asesores || []; appState.reportes = p.reportes || []; }
       } catch (e) {}
     }
 
     function saveCache() {
-      try { localStorage.setItem('elite_comercial_cache_v6', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
+      try { localStorage.setItem('elite_comercial_cache_v7', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
     }
 
     function updateConnectionIndicator() {
@@ -889,13 +934,22 @@
       const myReports = appState.reportes.filter(r => String(r.phone).replace(/\D/g, '') === phone);
 
       let monthSales = 0, yearSales = 0, quarterSales = 0;
+      let compMonthSales = 0, compYearSales = 0;
+
       myReports.forEach(r => {
         const parts = String(r.fecha || '').split('-');
         const effQty = getEffectiveSales(r);
+        const compQty = getComplementarySales(r);
         if (parts[0] === curYear) {
           yearSales += effQty;
-          if (Number(parts[1]) === curMonth) monthSales += effQty;
-          if (isMonthInQuarter(Number(parts[1]), curQuarter)) quarterSales += effQty;
+          compYearSales += compQty;
+          if (Number(parts[1]) === curMonth) {
+            monthSales += effQty;
+            compMonthSales += compQty;
+          }
+          if (isMonthInQuarter(Number(parts[1]), curQuarter)) {
+            quarterSales += effQty;
+          }
         }
       });
 
@@ -903,6 +957,7 @@
       monthSales = fixTriples(monthSales);
       quarterSales = fixTriples(quarterSales);
 
+      // Convención (NO incluye Emermédica / Salud Express)
       document.getElementById('adv-conv-target-num').textContent = metaConv;
       document.getElementById('adv-year-sales').textContent = yearSales;
       const convPct = Math.min(100, Math.round((yearSales / metaConv) * 100));
@@ -911,6 +966,7 @@
       const faltanViaje = formatScore(Math.max(0, metaConv - yearSales));
       document.getElementById('adv-conv-status').textContent = yearSales >= metaConv ? '¡Meta Cumplida!' : `${faltanViaje} para el viaje`;
 
+      // Bono Trimestral (NO incluye Emermédica / Salud Express)
       document.getElementById('adv-quarter-sales').textContent = quarterSales;
       const bonusPct = Math.min(100, Math.round((quarterSales / metaBono) * 100));
       document.getElementById('adv-bonus-bar').style.width = `${bonusPct}%`;
@@ -934,8 +990,12 @@
         bonusValueBox.classList.add('hidden');
         bonusCard.classList.remove('monetary-glow');
       }
+
+      // KPIs Secundarios
       document.getElementById('adv-month-sales').textContent = monthSales;
       document.getElementById('adv-month-target').textContent = metaMes;
+      document.getElementById('adv-comp-year-sales').textContent = compYearSales;
+      document.getElementById('adv-comp-month-sales').textContent = compMonthSales;
 
       document.getElementById('adv-history-count').textContent = `${myReports.length} registros`;
       const tbody = document.getElementById('adv-reports-tbody');
@@ -946,15 +1006,24 @@
           const rawQty = Number(r.polizas) || 1;
           const effQty = getEffectiveSales(r);
           const isAmb = isAmbulatoriaReport(r);
-          const qtyDisplay = isAmb
-            ? `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">${effQty}</span>`
-            : `<span class="font-bold text-slate-900">${rawQty}</span>`;
+          const isComp = isComplementaryReport(r);
+          let qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span>`;
+          let prodBadge = '';
+
+          if (isComp) {
+            qtyDisplay = `<span class="font-bold text-sky-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-bold">Aparte</span>`;
+            prodBadge = `<span class="text-[10px] font-bold text-sky-700">(No suma meta)</span>`;
+          } else if (isAmb) {
+            qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">${effQty}</span>`;
+            prodBadge = `<span class="text-[10px] font-bold text-amber-700">(0.33 c/u)</span>`;
+          }
+
           return `
           <tr class="hover:bg-slate-50/80">
             <td class="py-3 px-2 text-xs text-slate-500">${r.fecha}</td>
             <td class="py-3 px-2 font-semibold text-slate-800 text-xs">${r.cliente}</td>
             <td class="py-3 px-2">${getTipoBadgeHtml(parseTipoVenta(r))}</td>
-            <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)} ${isAmb ? '<span class="text-[10px] font-bold text-amber-700">(0.33 c/u)</span>' : ''}</td>
+            <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)} ${prodBadge}</td>
             <td class="py-3 px-2 text-center">${qtyDisplay}</td>
             <td class="py-3 px-2 text-right">
               <button onclick="deleteReport('${r.id}')" class="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -1000,12 +1069,13 @@
       const yearReports = appState.reportes.filter(r => String(r.fecha || '').startsWith(selYear));
       const periodReports = selMonth === 'ALL' ? yearReports : yearReports.filter(r => String(r.fecha || '').split('-')[1] === selMonth);
 
-      let totalVentas = 0, totalFam = 0, totalOtros = 0;
+      let totalVentas = 0, totalFam = 0, totalOtros = 0, totalComplementary = 0;
       const monthlyFam = new Array(12).fill(0), monthlyOtros = new Array(12).fill(0);
+
       yearReports.forEach(r => {
         const m = Number(String(r.fecha || '').split('-')[1] || 0) - 1;
-        const qty = getEffectiveSales(r);
-        if (m >= 0 && m < 12) {
+        const qty = getEffectiveSales(r); // 0 para Emermédica / Salud Express
+        if (m >= 0 && m < 12 && qty > 0) {
           if (isFamiliarType(parseTipoVenta(r))) monthlyFam[m] = fixTriples(monthlyFam[m] + qty);
           else monthlyOtros[m] = fixTriples(monthlyOtros[m] + qty);
         }
@@ -1013,8 +1083,12 @@
 
       periodReports.forEach(r => {
         const qty = getEffectiveSales(r);
+        const compQty = getComplementarySales(r);
         totalVentas += qty;
-        if (isFamiliarType(parseTipoVenta(r))) totalFam += qty; else totalOtros += qty;
+        totalComplementary += compQty;
+        if (qty > 0) {
+          if (isFamiliarType(parseTipoVenta(r))) totalFam += qty; else totalOtros += qty;
+        }
       });
 
       totalVentas = fixTriples(totalVentas);
@@ -1024,19 +1098,24 @@
       const advisorMap = {};
       appState.asesores.forEach(rawA => {
         const p = parseAdvisorRecord(rawA);
-        advisorMap[p.phone] = { phone: p.phone, name: p.cleanName, password: p.password, ventasPeriodo: 0, ventasTrimestre: 0 };
+        advisorMap[p.phone] = { phone: p.phone, name: p.cleanName, password: p.password, ventasPeriodo: 0, compPeriodo: 0, ventasTrimestre: 0 };
       });
       yearReports.forEach(r => {
         const p = String(r.phone).replace(/\D/g, '');
-        if (!advisorMap[p]) advisorMap[p] = { phone: p, name: cleanAdvisorDisplay(r.asesor), password: '1234', ventasPeriodo: 0, ventasTrimestre: 0 };
+        if (!advisorMap[p]) advisorMap[p] = { phone: p, name: cleanAdvisorDisplay(r.asesor), password: '1234', ventasPeriodo: 0, compPeriodo: 0, ventasTrimestre: 0 };
         const m = Number(String(r.fecha || '').split('-')[1] || 0);
         const qty = getEffectiveSales(r);
+        const compQty = getComplementarySales(r);
         if (isMonthInQuarter(m, selQuarter)) advisorMap[p].ventasTrimestre = fixTriples(advisorMap[p].ventasTrimestre + qty);
-        if (selMonth === 'ALL' || String(r.fecha).split('-')[1] === selMonth) advisorMap[p].ventasPeriodo = fixTriples(advisorMap[p].ventasPeriodo + qty);
+        if (selMonth === 'ALL' || String(r.fecha).split('-')[1] === selMonth) {
+          advisorMap[p].ventasPeriodo = fixTriples(advisorMap[p].ventasPeriodo + qty);
+          advisorMap[p].compPeriodo += compQty;
+        }
       });
 
       const advisorList = Object.values(advisorMap).sort((a, b) => b.ventasPeriodo - a.ventasPeriodo);
       document.getElementById('kpi-total-ventas').textContent = totalVentas;
+      document.getElementById('kpi-total-complementary').textContent = totalComplementary;
       document.getElementById('kpi-bonus-qualified').textContent = advisorList.filter(a => a.ventasTrimestre >= metaBono).length;
       document.getElementById('kpi-total-advisors').textContent = advisorList.length;
       if (advisorList.length > 0 && advisorList[0].ventasPeriodo > 0) {
@@ -1050,11 +1129,12 @@
       document.getElementById('chart-legend-usuario').textContent = totalOtros;
       renderAdminCharts(monthlyOtros, monthlyFam, advisorList, metaBono, totalOtros, totalFam);
 
-      document.getElementById('admin-ranking-tbody').innerHTML = advisorList.length === 0 ? `<tr><td colspan="6" class="py-6 text-center text-slate-400">Sin asesores</td></tr>` : advisorList.map((a) => `
+      document.getElementById('admin-ranking-tbody').innerHTML = advisorList.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-slate-400">Sin asesores</td></tr>` : advisorList.map((a) => `
         <tr class="hover:bg-slate-50/80">
           <td class="py-3 px-2"><span class="font-bold text-slate-900">${a.name}</span><span class="block text-[11px] text-slate-400">${a.phone}</span></td>
           <td class="py-3 px-2 text-center"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-900 font-mono text-xs font-bold">${a.password}</span></td>
           <td class="py-3 px-2 text-center font-bold">${a.ventasPeriodo}</td>
+          <td class="py-3 px-2 text-center font-bold text-sky-800">${a.compPeriodo}</td>
           <td class="py-3 px-2 text-center font-bold ${a.ventasTrimestre >= metaBono ? 'text-emerald-600' : ''}">${a.ventasTrimestre} / ${metaBono}</td>
           <td class="py-3 px-2">${a.ventasTrimestre >= metaBono ? '<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Califica</span>' : '<span class="text-slate-500 text-xs">En proceso</span>'}</td>
           <td class="py-3 px-2 text-right"><button onclick="openEditAdvisorModal('${a.phone}')" class="px-2 py-1 rounded bg-slate-100 text-xs font-semibold">Editar</button></td>
@@ -1066,16 +1146,25 @@
         const rawQty = Number(r.polizas) || 1;
         const effQty = getEffectiveSales(r);
         const isAmb = isAmbulatoriaReport(r);
-        const qtyDisplay = isAmb
-          ? `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">${effQty}</span>`
-          : `<span class="font-bold text-slate-900">${rawQty}</span>`;
+        const isComp = isComplementaryReport(r);
+        let qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span>`;
+        let prodBadge = '';
+
+        if (isComp) {
+          qtyDisplay = `<span class="font-bold text-sky-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-bold">Aparte</span>`;
+          prodBadge = `<span class="text-[10px] font-bold text-sky-700">(No suma meta)</span>`;
+        } else if (isAmb) {
+          qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">${effQty}</span>`;
+          prodBadge = `<span class="text-[10px] font-bold text-amber-700">(0.33 c/u)</span>`;
+        }
+
         return `
         <tr class="hover:bg-slate-50/80">
           <td class="py-3 px-2 text-xs text-slate-500">${r.fecha}</td>
           <td class="py-3 px-2 font-semibold text-slate-800 text-xs">${cleanAdvisorDisplay(r.asesor)}</td>
           <td class="py-3 px-2 text-xs">${r.cliente}</td>
           <td class="py-3 px-2">${getTipoBadgeHtml(parseTipoVenta(r))}</td>
-          <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)} ${isAmb ? '<span class="text-[10px] font-bold text-amber-700">(0.33 c/u)</span>' : ''}</td>
+          <td class="py-3 px-2 text-xs text-slate-600">${cleanProductoName(r)} ${prodBadge}</td>
           <td class="py-3 px-2 text-center">${qtyDisplay}</td>
           <td class="py-3 px-2 text-right"><button onclick="deleteReport('${r.id}')" class="p-1 rounded text-rose-500 hover:bg-rose-50"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
         </tr>
@@ -1160,7 +1249,7 @@
       updateConnectionIndicator(); closeSheetsModal(); await syncWithSheets(true);
     }
     function exportReportsCSV() {
-      const csv = '\uFEFF' + ['Fecha,Asesor,Cliente,Tipo,Producto,Polizas_Reportadas,Afiliaciones_Efectivas'].join(',') + '\n' + appState.reportes.map(r => `${r.fecha},"${cleanAdvisorDisplay(r.asesor)}","${r.cliente}",${parseTipoVenta(r)},"${cleanProductoName(r)}",${r.polizas || 1},${getEffectiveSales(r)}`).join('\n');
+      const csv = '\uFEFF' + ['Fecha,Asesor,Cliente,Tipo,Producto,Polizas_Reportadas,Afiliaciones_Meta,Emermedica_SaludExpress'].join(',') + '\n' + appState.reportes.map(r => `${r.fecha},"${cleanAdvisorDisplay(r.asesor)}","${r.cliente}",${parseTipoVenta(r)},"${cleanProductoName(r)}",${r.polizas || 1},${getEffectiveSales(r)},${getComplementarySales(r)}`).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Reportes_${new Date().toISOString().slice(0,10)}.csv`;
       document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('Descargado.');
