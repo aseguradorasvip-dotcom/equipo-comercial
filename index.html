@@ -39,6 +39,7 @@
       ADMIN_PASS: "2026",
       DEFAULT_META_MENSUAL: 5,
       DEFAULT_META_CONVENCION: 45,
+      DEFAULT_META_NETOS: 20,
       META_BONO_TRIMESTRAL: 11,
       VALOR_BONO_TRIMESTRAL: "1,500,000",
       DEFAULT_ADVISOR_PASS: "1234",
@@ -105,7 +106,7 @@
         <div id="login-admin-panel" class="px-6 pb-7 pt-2 hidden">
           <div class="text-center mb-6">
             <h2 class="font-display font-bold text-xl text-slate-900">Dirección Comercial</h2>
-            <p class="text-slate-500 text-xs sm:text-sm mt-1">Gestión general de asesores y metas.</p>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">Gestión general de asesores, netos y metas.</p>
           </div>
           <form onsubmit="handleAdminLogin(event)" class="space-y-4">
             <div>
@@ -216,6 +217,69 @@
 
       </div>
 
+      <!-- NUEVA FILA: NETOS POSITIVOS DE CARTERA Y CRECIMIENTO VS AÑO ANTERIOR -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Tarjeta Netos Positivos -->
+        <div id="adv-netos-card" class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Netos Positivos de Cartera</span>
+                <span id="adv-netos-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">En curso</span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="adv-netos-real" class="font-display font-extrabold text-3xl text-slate-900">0</span>
+                <span class="text-xs text-slate-500">/ Meta: <strong id="adv-netos-meta" class="text-slate-700">+20</strong> netos</span>
+              </div>
+            </div>
+            <div id="adv-netos-icon-box" class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="mt-3 space-y-1.5">
+            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+              <div id="adv-netos-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-1">
+              <span>Base cierre ant.: <strong id="adv-cartera-base" class="text-slate-700">0</strong></span>
+              <span>Cartera actual: <strong id="adv-cartera-actual" class="text-slate-900">0</strong> <span id="adv-bajas-info" class="text-rose-600"></span></span>
+            </div>
+            <p id="adv-netos-hint" class="text-[11px] text-slate-500">Piso mínimo para cumplir netos: <strong id="adv-cartera-piso" class="text-slate-800">20</strong> usuarios activos.</p>
+          </div>
+        </div>
+
+        <!-- Tarjeta Crecimiento vs Año Anterior -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow flex flex-col justify-between">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Crecimiento vs. Año Anterior</span>
+                <span id="adv-growth-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">0%</span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="adv-growth-diff" class="font-display font-extrabold text-3xl text-slate-900">0</span>
+                <span class="text-xs text-slate-500">usuarios frente al periodo anterior</span>
+              </div>
+            </div>
+            <div id="adv-growth-icon-box" class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <i data-lucide="trending-up" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-slate-50 rounded-xl p-2.5">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold block">Producción Año Ant.</span>
+              <span id="adv-prod-anterior" class="font-display font-bold text-base text-slate-700">0</span>
+            </div>
+            <div class="bg-emerald-50/70 rounded-xl p-2.5">
+              <span class="text-[10px] text-emerald-700 uppercase font-semibold block">Producción Año Actual</span>
+              <span id="adv-prod-actual" class="font-display font-bold text-base text-emerald-900">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- KPIs Secundarios (3 columnas: Mes Principal, Emermédica/Salud Express aparte, Bolsa Millonaria) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow flex items-center justify-between">
@@ -232,7 +296,7 @@
           </div>
         </div>
 
-        <!-- NUEVO CONTADOR APARTE: EMERMÉDICA & SALUD EXPRESS -->
+        <!-- CONTADOR APARTE: EMERMÉDICA & SALUD EXPRESS -->
         <div class="bg-white rounded-2xl p-5 border border-sky-100 card-shadow flex items-center justify-between">
           <div>
             <span class="text-xs font-semibold text-sky-700 uppercase">Emermédica & Salud Express</span>
@@ -396,7 +460,7 @@
       <div class="bg-white rounded-3xl p-5 border border-slate-100 card-shadow flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <h1 class="font-display font-bold text-xl sm:text-2xl text-slate-900">Tablero de Dirección Comercial</h1>
-          <p class="text-xs sm:text-sm text-slate-500">Convención y Bonos (Planes principales + Ambulatoria 0.33) · Emermédica y Salud Express en contador aparte.</p>
+          <p class="text-xs sm:text-sm text-slate-500">Parametrización de metas, Netos Positivos de cartera y Crecimiento vs. Año Anterior.</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
@@ -449,50 +513,74 @@
         </div>
       </div>
 
-      <!-- KPIs Dirección (4 columnas) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
-          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
+      <!-- KPIs Dirección (6 columnas responsivas: Metas, Netos Equipo, Crec. vs Año Ant., Emermédica, Bono Trimestral, Líder) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-[11px] font-semibold uppercase">
             <span>Afiliaciones Meta</span>
-            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <i data-lucide="trending-up" class="w-4 h-4"></i>
+            <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
             </div>
           </div>
-          <p id="kpi-total-ventas" class="font-display font-extrabold text-3xl text-slate-900 mt-2">0</p>
-          <p id="kpi-periodo-desc" class="text-xs text-slate-500 mt-1">Válidas para Convención y Bono</p>
+          <p id="kpi-total-ventas" class="font-display font-extrabold text-2xl text-slate-900 mt-2">0</p>
+          <p id="kpi-periodo-desc" class="text-[11px] text-slate-500 mt-1">Convención y Bono</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-sky-100 card-shadow">
-          <div class="flex items-center justify-between text-sky-700 text-xs font-semibold uppercase">
-            <span>Emermédica & Salud Exp.</span>
-            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
-              <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+        <!-- NUEVO KPI DIRECTOR: NETOS POSITIVOS EQUIPO -->
+        <div class="bg-white rounded-2xl p-4 border border-indigo-100 card-shadow">
+          <div class="flex items-center justify-between text-indigo-700 text-[11px] font-semibold uppercase">
+            <span>Netos del Equipo</span>
+            <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
             </div>
           </div>
-          <p id="kpi-total-complementary" class="font-display font-extrabold text-3xl text-sky-900 mt-2">0</p>
-          <p class="text-xs text-slate-500 mt-1">Contador independiente periodo</p>
+          <p id="kpi-total-netos" class="font-display font-extrabold text-2xl text-indigo-950 mt-2">0</p>
+          <p id="kpi-netos-qualified-desc" class="text-[11px] text-slate-500 mt-1">0 cumplen meta netos</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
-          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Calificados Bono Trimestral</span>
-            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-              <i data-lucide="award" class="w-4 h-4"></i>
+        <!-- NUEVO KPI DIRECTOR: CRECIMIENTO VS AÑO ANTERIOR -->
+        <div class="bg-white rounded-2xl p-4 border border-emerald-100 card-shadow">
+          <div class="flex items-center justify-between text-emerald-700 text-[11px] font-semibold uppercase">
+            <span>Crec. vs Año Ant.</span>
+            <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
             </div>
           </div>
-          <p class="font-display font-extrabold text-3xl text-amber-600 mt-2"><span id="kpi-bonus-qualified">0</span> <span class="text-base font-semibold text-slate-400">/ <span id="kpi-total-advisors">0</span></span></p>
-          <p id="kpi-quarter-desc" class="text-xs text-slate-500 mt-1">Asesores con ≥ 11 puntos</p>
+          <p id="kpi-total-growth" class="font-display font-extrabold text-2xl text-slate-900 mt-2">0</p>
+          <p id="kpi-growth-pct-desc" class="text-[11px] text-slate-500 mt-1">Base año ant.: 0</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow">
-          <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase">
-            <span>Líder en Convención</span>
-            <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-800 flex items-center justify-center">
-              <i data-lucide="crown" class="w-4 h-4 text-amber-500"></i>
+        <div class="bg-white rounded-2xl p-4 border border-sky-100 card-shadow">
+          <div class="flex items-center justify-between text-sky-700 text-[11px] font-semibold uppercase">
+            <span>Emermédica & S.Exp</span>
+            <div class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+              <i data-lucide="heart-pulse" class="w-3.5 h-3.5"></i>
             </div>
           </div>
-          <p id="kpi-top-advisor" class="font-display font-bold text-lg text-slate-900 mt-2 truncate">Sin registros</p>
-          <p id="kpi-top-advisor-sales" class="text-xs text-emerald-600 font-semibold mt-1">0 afiliaciones</p>
+          <p id="kpi-total-complementary" class="font-display font-extrabold text-2xl text-sky-900 mt-2">0</p>
+          <p class="text-[11px] text-slate-500 mt-1">Contador aparte</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-[11px] font-semibold uppercase">
+            <span>Bono Trimestral</span>
+            <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i data-lucide="award" class="w-3.5 h-3.5"></i>
+            </div>
+          </div>
+          <p class="font-display font-extrabold text-2xl text-amber-600 mt-2"><span id="kpi-bonus-qualified">0</span> <span class="text-sm font-semibold text-slate-400">/ <span id="kpi-total-advisors">0</span></span></p>
+          <p id="kpi-quarter-desc" class="text-[11px] text-slate-500 mt-1">Asesores con ≥ 11 pts</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 border border-slate-100 card-shadow">
+          <div class="flex items-center justify-between text-slate-500 text-[11px] font-semibold uppercase">
+            <span>Líder Convención</span>
+            <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-800 flex items-center justify-center">
+              <i data-lucide="crown" class="w-3.5 h-3.5 text-amber-500"></i>
+            </div>
+          </div>
+          <p id="kpi-top-advisor" class="font-display font-bold text-base text-slate-900 mt-2 truncate">Sin registros</p>
+          <p id="kpi-top-advisor-sales" class="text-[11px] text-emerald-600 font-semibold mt-1">0 afiliaciones</p>
         </div>
       </div>
 
@@ -536,8 +624,8 @@
         <div class="lg:col-span-8 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
-              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Equipo Comercial & Bonos</h2>
-              <p class="text-xs text-slate-500">Gestión de credenciales, metas y contador Emermédica/Salud Express</p>
+              <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Equipo Comercial, Netos & Crecimiento</h2>
+              <p class="text-xs text-slate-500">Haz clic en "Editar / Metas" para ajustar cartera base, meta de netos y producción anterior de cada asesor</p>
             </div>
             <button onclick="openCreateAdvisorModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition self-start">+ Nuevo Asesor</button>
           </div>
@@ -548,10 +636,12 @@
                   <th class="py-3 px-2">Asesor</th>
                   <th class="py-3 px-2 text-center">Clave</th>
                   <th class="py-3 px-2 text-center">Meta Per.</th>
+                  <th class="py-3 px-2 text-center text-indigo-700">Netos (Cartera)</th>
+                  <th class="py-3 px-2 text-center text-emerald-700">Crec. vs Ant.</th>
                   <th class="py-3 px-2 text-center text-sky-700">Emer./S.Exp</th>
                   <th class="py-3 px-2 text-center">Trimestre</th>
-                  <th class="py-3 px-2">Bono (≥11)</th>
-                  <th class="py-3 px-2 text-right">Editar</th>
+                  <th class="py-3 px-2">Bono</th>
+                  <th class="py-3 px-2 text-right">Metas</th>
                 </tr>
               </thead>
               <tbody id="admin-ranking-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
@@ -589,11 +679,14 @@
     </div>
   </div>
 
-  <!-- MODAL ASESOR -->
-  <div id="advisor-form-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
+  <!-- MODAL ASESOR (CON PARAMETRIZACIÓN DE NETOS Y CRECIMIENTO PARA DIRECTOR COMERCIAL) -->
+  <div id="advisor-form-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl my-auto">
       <div class="flex items-center justify-between mb-4">
-        <h3 id="advisor-modal-title" class="font-display font-bold text-lg text-slate-900">Registrar Asesor</h3>
+        <div>
+          <h3 id="advisor-modal-title" class="font-display font-bold text-lg text-slate-900">Registrar Asesor</h3>
+          <p class="text-xs text-slate-500">Define las metas individuales de producción, netos y referencia histórica.</p>
+        </div>
         <button onclick="closeAdvisorFormModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form onsubmit="saveAdvisorForm(event)" class="space-y-4">
@@ -612,6 +705,7 @@
             <input type="text" id="adv-form-pass" required placeholder="1234" class="w-full px-3.5 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm font-bold text-amber-950" />
           </div>
         </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Meta Mensual</label>
@@ -622,9 +716,44 @@
             <input type="number" id="adv-form-convencion" required min="1" value="45" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold" />
           </div>
         </div>
+
+        <!-- SECCIÓN DE PARAMETRIZACIÓN DE NETOS POSITIVOS Y CRECIMIENTO -->
+        <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100 space-y-3">
+          <div class="flex items-center gap-1.5 text-indigo-900 font-bold text-xs uppercase tracking-wider">
+            <i data-lucide="sliders" class="w-3.5 h-3.5 text-indigo-600"></i>
+            <span>Reglas Individuales de Netos & Crecimiento</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Cartera Cierre Año Ant.</label>
+              <input type="number" id="adv-form-cartera-base" required min="0" value="0" placeholder="Ej. 100" class="w-full px-3 py-2 bg-white border border-indigo-200 rounded-xl text-sm font-bold text-slate-900" />
+              <span class="text-[10px] text-slate-500 block mt-0.5">Usuarios activos al cierre</span>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Meta Netos Positivos</label>
+              <input type="number" id="adv-form-meta-netos" required min="0" value="20" placeholder="Ej. 20" class="w-full px-3 py-2 bg-white border border-indigo-200 rounded-xl text-sm font-bold text-indigo-900" />
+              <span class="text-[10px] text-slate-500 block mt-0.5">Mínimo a crecer en cartera</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Producción Año Anterior</label>
+              <input type="number" id="adv-form-prod-ant" required min="0" value="0" placeholder="Ej. 100" class="w-full px-3 py-2 bg-white border border-emerald-200 rounded-xl text-sm font-bold text-emerald-900" />
+              <span class="text-[10px] text-slate-500 block mt-0.5">Total afiliaciones año pasado</span>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Bajas / Cancelaciones Acum.</label>
+              <input type="number" id="adv-form-bajas" required min="0" value="0" placeholder="Ej. 0" class="w-full px-3 py-2 bg-white border border-rose-200 rounded-xl text-sm font-bold text-rose-900" />
+              <span class="text-[10px] text-slate-500 block mt-0.5">Retiros descontados este año</span>
+            </div>
+          </div>
+        </div>
+
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" onclick="closeAdvisorFormModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold">Cancelar</button>
-          <button type="submit" id="btn-save-advisor" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-md">Guardar</button>
+          <button type="submit" id="btn-save-advisor" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-md">Guardar Parámetros</button>
         </div>
       </form>
     </div>
@@ -676,7 +805,7 @@
 
     // Devuelve los puntos válidos para Convención Anual, Bono Trimestral y Meta Mensual
     function getEffectiveSales(rep) {
-      if (isComplementaryReport(rep)) return 0; // Emermédica y Salud Express NO suman a metas
+      if (isComplementaryReport(rep)) return 0;
       const qty = Number(rep.polizas) || 1;
       if (isAmbulatoriaReport(rep)) {
         if (qty % 3 === 0) return qty / 3;
@@ -693,6 +822,11 @@
 
     function formatScore(num) {
       return Number(Number(num || 0).toFixed(2));
+    }
+
+    function formatSignedNumber(num) {
+      const val = formatScore(num);
+      return val > 0 ? `+${val}` : `${val}`;
     }
 
     function fixTriples(val) {
@@ -718,15 +852,91 @@
       }
     }
 
+    // Codifica y decodifica parámetros individuales (PW, Cartera Base, Meta Netos, Producción Año Ant., Bajas)
+    // directamente en el campo name para 100% compatibilidad sin modificar el Google Apps Script
     function parseAdvisorRecord(rawAdv) {
       const rawName = String(rawAdv.name || '').trim();
-      const match = rawName.match(/^(.*?)\s*\[PW:([^\]]+)\]$/);
-      if (match) return { ...rawAdv, cleanName: match[1].trim(), password: match[2].trim() };
-      return { ...rawAdv, cleanName: rawName, password: String(rawAdv.password || CONFIG.DEFAULT_ADVISOR_PASS || '1234') };
+      let cleanName = rawName;
+      let password = String(rawAdv.password || CONFIG.DEFAULT_ADVISOR_PASS || '1234');
+      let carteraBase = Number(rawAdv.carteraBase) || 0;
+      let metaNetos = rawAdv.metaNetos !== undefined ? Number(rawAdv.metaNetos) : CONFIG.DEFAULT_META_NETOS;
+      let prodAnterior = Number(rawAdv.prodAnterior) || 0;
+      let bajas = Number(rawAdv.bajas) || 0;
+
+      const pwMatch = cleanName.match(/\[PW:([^\]]+)\]/);
+      if (pwMatch) password = pwMatch[1].trim();
+
+      const cbMatch = cleanName.match(/\[CB:([^\]]+)\]/);
+      if (cbMatch) carteraBase = Number(cbMatch[1]) || 0;
+
+      const mnMatch = cleanName.match(/\[MN:([^\]]+)\]/);
+      if (mnMatch) metaNetos = Number(mnMatch[1]);
+
+      const paMatch = cleanName.match(/\[PA:([^\]]+)\]/);
+      if (paMatch) prodAnterior = Number(paMatch[1]) || 0;
+
+      const bjMatch = cleanName.match(/\[BJ:([^\]]+)\]/);
+      if (bjMatch) bajas = Number(bjMatch[1]) || 0;
+
+      cleanName = cleanName.replace(/\s*\[(PW|CB|MN|PA|BJ):[^\]]+\]/g, '').trim();
+
+      return {
+        ...rawAdv,
+        cleanName,
+        password,
+        carteraBase,
+        metaNetos,
+        prodAnterior,
+        bajas
+      };
     }
 
-    function encodeAdvisorNameWithPass(cleanName, password) {
-      return `${String(cleanName || '').replace(/\[PW:[^\]]+\]/g, '').trim()} [PW:${String(password || '1234').trim()}]`;
+    function encodeAdvisorRecord(cleanName, password, carteraBase, metaNetos, prodAnterior, bajas) {
+      const baseName = String(cleanName || '').replace(/\s*\[(PW|CB|MN|PA|BJ):[^\]]+\]/g, '').trim();
+      const pw = String(password || '1234').trim();
+      const cb = Math.max(0, Number(carteraBase) || 0);
+      const mn = Math.max(0, Number(metaNetos) || 0);
+      const pa = Math.max(0, Number(prodAnterior) || 0);
+      const bj = Math.max(0, Number(bajas) || 0);
+      return `${baseName} [PW:${pw}] [CB:${cb}] [MN:${mn}] [PA:${pa}] [BJ:${bj}]`;
+    }
+
+    function cleanAdvisorDisplay(rawName) {
+      return String(rawName || '').replace(/\s*\[(PW|CB|MN|PA|BJ):[^\]]+\]/g, '').trim();
+    }
+
+    // Cálculo centralizado de Netos Positivos y Crecimiento vs Año Anterior por asesor
+    function computeAdvisorMetrics(parsedAdv, yearSales) {
+      const carteraBase = Number(parsedAdv.carteraBase) || 0;
+      const metaNetos = Number(parsedAdv.metaNetos) || 0;
+      const prodAnterior = Number(parsedAdv.prodAnterior) || 0;
+      const bajas = Number(parsedAdv.bajas) || 0;
+
+      // Cartera Actual = Cartera Base + Afiliaciones efectivas del año - Bajas del año
+      const carteraActual = fixTriples(Math.max(0, carteraBase + yearSales - bajas));
+      // Netos Reales = Cartera Actual - Cartera Base (equivale a yearSales - bajas)
+      const netosReales = fixTriples(carteraActual - carteraBase);
+      const pisoCartera = fixTriples(carteraBase + metaNetos);
+      const cumpleNetos = netosReales >= metaNetos;
+
+      // Crecimiento de producción vs año anterior
+      const crecimientoUsuarios = fixTriples(yearSales - prodAnterior);
+      const crecimientoPct = prodAnterior > 0
+        ? Math.round(((yearSales - prodAnterior) / prodAnterior) * 100)
+        : (yearSales > 0 ? 100 : 0);
+
+      return {
+        carteraBase,
+        carteraActual,
+        netosReales,
+        metaNetos,
+        pisoCartera,
+        cumpleNetos,
+        bajas,
+        prodAnterior,
+        crecimientoUsuarios,
+        crecimientoPct
+      };
     }
 
     function getScriptUrl() {
@@ -784,7 +994,6 @@
     }
 
     function cleanProductoName(rep) { return String(rep.ramo || "General").replace(/^\[[^\]]+\]\s*/i, ""); }
-    function cleanAdvisorDisplay(rawName) { return String(rawName || '').replace(/\s*\[PW:[^\]]+\]$/, '').trim(); }
 
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
@@ -798,13 +1007,13 @@
 
     function loadCache() {
       try {
-        const cached = localStorage.getItem('elite_comercial_cache_v7');
+        const cached = localStorage.getItem('elite_comercial_cache_v8');
         if (cached) { const p = JSON.parse(cached); appState.asesores = p.asesores || []; appState.reportes = p.reportes || []; }
       } catch (e) {}
     }
 
     function saveCache() {
-      try { localStorage.setItem('elite_comercial_cache_v7', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
+      try { localStorage.setItem('elite_comercial_cache_v8', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
     }
 
     function updateConnectionIndicator() {
@@ -991,6 +1200,74 @@
         bonusCard.classList.remove('monetary-glow');
       }
 
+      // --- NUEVOS INDICADORES ASESOR: NETOS POSITIVOS Y CRECIMIENTO VS AÑO ANTERIOR ---
+      const metrics = computeAdvisorMetrics(advisor, yearSales);
+
+      // 1. Netos Positivos
+      const netosRealEl = document.getElementById('adv-netos-real');
+      const netosBadgeEl = document.getElementById('adv-netos-badge');
+      const netosBarEl = document.getElementById('adv-netos-bar');
+      const netosIconBox = document.getElementById('adv-netos-icon-box');
+
+      netosRealEl.textContent = formatSignedNumber(metrics.netosReales);
+      document.getElementById('adv-netos-meta').textContent = formatSignedNumber(metrics.metaNetos);
+      document.getElementById('adv-cartera-base').textContent = metrics.carteraBase;
+      document.getElementById('adv-cartera-actual').textContent = metrics.carteraActual;
+      document.getElementById('adv-cartera-piso').textContent = metrics.pisoCartera;
+      document.getElementById('adv-bajas-info').textContent = metrics.bajas > 0 ? `(-${metrics.bajas} bajas)` : '';
+
+      const netosPct = metrics.metaNetos > 0
+        ? Math.max(0, Math.min(100, Math.round((metrics.netosReales / metrics.metaNetos) * 100)))
+        : (metrics.netosReales >= 0 ? 100 : 0);
+      netosBarEl.style.width = `${netosPct}%`;
+
+      if (metrics.netosReales < 0) {
+        netosRealEl.className = "font-display font-extrabold text-3xl text-rose-600";
+        netosBadgeEl.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800";
+        netosBadgeEl.textContent = "En negativo";
+        netosBarEl.className = "bg-rose-500 h-2 rounded-full transition-all duration-500";
+        netosIconBox.className = "w-11 h-11 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0";
+      } else if (metrics.cumpleNetos) {
+        netosRealEl.className = "font-display font-extrabold text-3xl text-emerald-700";
+        netosBadgeEl.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800";
+        netosBadgeEl.textContent = "¡Cumple Netos!";
+        netosBarEl.className = "bg-emerald-500 h-2 rounded-full transition-all duration-500";
+        netosIconBox.className = "w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0";
+      } else {
+        netosRealEl.className = "font-display font-extrabold text-3xl text-indigo-950";
+        netosBadgeEl.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800";
+        const faltanNetos = formatScore(Math.max(0, metrics.metaNetos - metrics.netosReales));
+        netosBadgeEl.textContent = `Faltan ${faltanNetos}`;
+        netosBarEl.className = "bg-indigo-600 h-2 rounded-full transition-all duration-500";
+        netosIconBox.className = "w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0";
+      }
+
+      // 2. Crecimiento vs Año Anterior
+      const growthDiffEl = document.getElementById('adv-growth-diff');
+      const growthBadgeEl = document.getElementById('adv-growth-badge');
+      const growthIconBox = document.getElementById('adv-growth-icon-box');
+
+      growthDiffEl.textContent = formatSignedNumber(metrics.crecimientoUsuarios);
+      document.getElementById('adv-prod-anterior').textContent = metrics.prodAnterior;
+      document.getElementById('adv-prod-actual').textContent = yearSales;
+
+      if (metrics.crecimientoUsuarios > 0) {
+        growthDiffEl.className = "font-display font-extrabold text-3xl text-emerald-700";
+        growthBadgeEl.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800";
+        growthBadgeEl.textContent = `+${metrics.crecimientoPct}% vs ant.`;
+        growthIconBox.className = "w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0";
+      } else if (metrics.crecimientoUsuarios < 0) {
+        growthDiffEl.className = "font-display font-extrabold text-3xl text-rose-600";
+        growthBadgeEl.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800";
+        growthBadgeEl.textContent = `${metrics.crecimientoPct}% vs ant.`;
+        growthIconBox.className = "w-11 h-11 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0";
+      } else {
+        growthDiffEl.className = "font-display font-extrabold text-3xl text-slate-900";
+        growthBadgeEl.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700";
+        growthBadgeEl.textContent = "0% vs ant.";
+        growthIconBox.className = "w-11 h-11 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0";
+      }
+
       // KPIs Secundarios
       document.getElementById('adv-month-sales').textContent = monthSales;
       document.getElementById('adv-month-target').textContent = metaMes;
@@ -1053,7 +1330,7 @@
         if (res && res.status === 'ok' && res.data) { appState.asesores = res.data.asesores; appState.reportes = res.data.reportes; }
         else { appState.reportes.push(newRep); }
         saveCache(); document.getElementById('rep-cliente').value = ''; document.getElementById('rep-polizas').value = '1';
-        renderAdvisorDashboard(); showToast('Venta registrada.');
+        renderAdvisorDashboard(); showToast('Venta registrada y netos actualizados.');
       } catch (err) { appState.reportes.push(newRep); saveCache(); renderAdvisorDashboard(); showToast('Guardado localmente.', 'warning'); }
       finally { btn.disabled = false; }
     }
@@ -1074,7 +1351,7 @@
 
       yearReports.forEach(r => {
         const m = Number(String(r.fecha || '').split('-')[1] || 0) - 1;
-        const qty = getEffectiveSales(r); // 0 para Emermédica / Salud Express
+        const qty = getEffectiveSales(r);
         if (m >= 0 && m < 12 && qty > 0) {
           if (isFamiliarType(parseTipoVenta(r))) monthlyFam[m] = fixTriples(monthlyFam[m] + qty);
           else monthlyOtros[m] = fixTriples(monthlyOtros[m] + qty);
@@ -1098,14 +1375,38 @@
       const advisorMap = {};
       appState.asesores.forEach(rawA => {
         const p = parseAdvisorRecord(rawA);
-        advisorMap[p.phone] = { phone: p.phone, name: p.cleanName, password: p.password, ventasPeriodo: 0, compPeriodo: 0, ventasTrimestre: 0 };
+        advisorMap[p.phone] = {
+          ...p,
+          name: p.cleanName,
+          ventasAnio: 0,
+          ventasPeriodo: 0,
+          compPeriodo: 0,
+          ventasTrimestre: 0
+        };
       });
+
       yearReports.forEach(r => {
         const p = String(r.phone).replace(/\D/g, '');
-        if (!advisorMap[p]) advisorMap[p] = { phone: p, name: cleanAdvisorDisplay(r.asesor), password: '1234', ventasPeriodo: 0, compPeriodo: 0, ventasTrimestre: 0 };
+        if (!advisorMap[p]) {
+          advisorMap[p] = {
+            phone: p,
+            name: cleanAdvisorDisplay(r.asesor),
+            password: '1234',
+            carteraBase: 0,
+            metaNetos: CONFIG.DEFAULT_META_NETOS,
+            prodAnterior: 0,
+            bajas: 0,
+            ventasAnio: 0,
+            ventasPeriodo: 0,
+            compPeriodo: 0,
+            ventasTrimestre: 0
+          };
+        }
         const m = Number(String(r.fecha || '').split('-')[1] || 0);
         const qty = getEffectiveSales(r);
         const compQty = getComplementarySales(r);
+
+        advisorMap[p].ventasAnio = fixTriples(advisorMap[p].ventasAnio + qty);
         if (isMonthInQuarter(m, selQuarter)) advisorMap[p].ventasTrimestre = fixTriples(advisorMap[p].ventasTrimestre + qty);
         if (selMonth === 'ALL' || String(r.fecha).split('-')[1] === selMonth) {
           advisorMap[p].ventasPeriodo = fixTriples(advisorMap[p].ventasPeriodo + qty);
@@ -1113,11 +1414,37 @@
         }
       });
 
-      const advisorList = Object.values(advisorMap).sort((a, b) => b.ventasPeriodo - a.ventasPeriodo);
+      const advisorList = Object.values(advisorMap).map(a => {
+        const metrics = computeAdvisorMetrics(a, a.ventasAnio);
+        return { ...a, metrics };
+      }).sort((a, b) => b.ventasPeriodo - a.ventasPeriodo);
+
+      // Consolidado Global de Netos y Crecimiento para el Director Comercial
+      const totalTeamNetos = fixTriples(advisorList.reduce((acc, a) => acc + a.metrics.netosReales, 0));
+      const advisorsMeetingNetos = advisorList.filter(a => a.metrics.cumpleNetos).length;
+      const totalTeamProdAnt = fixTriples(advisorList.reduce((acc, a) => acc + a.metrics.prodAnterior, 0));
+      const totalTeamProdAct = fixTriples(advisorList.reduce((acc, a) => acc + a.ventasAnio, 0));
+      const totalTeamGrowth = fixTriples(totalTeamProdAct - totalTeamProdAnt);
+      const totalTeamGrowthPct = totalTeamProdAnt > 0
+        ? Math.round(((totalTeamProdAct - totalTeamProdAnt) / totalTeamProdAnt) * 100)
+        : (totalTeamProdAct > 0 ? 100 : 0);
+
       document.getElementById('kpi-total-ventas').textContent = totalVentas;
+
+      const kpiNetosEl = document.getElementById('kpi-total-netos');
+      kpiNetosEl.textContent = formatSignedNumber(totalTeamNetos);
+      kpiNetosEl.className = `font-display font-extrabold text-2xl mt-2 ${totalTeamNetos >= 0 ? 'text-indigo-950' : 'text-rose-600'}`;
+      document.getElementById('kpi-netos-qualified-desc').textContent = `${advisorsMeetingNetos} de ${advisorList.length} cumplen netos`;
+
+      const kpiGrowthEl = document.getElementById('kpi-total-growth');
+      kpiGrowthEl.textContent = `${formatSignedNumber(totalTeamGrowth)} (${totalTeamGrowth >= 0 ? '+' : ''}${totalTeamGrowthPct}%)`;
+      kpiGrowthEl.className = `font-display font-extrabold text-xl mt-2 ${totalTeamGrowth >= 0 ? 'text-emerald-700' : 'text-rose-600'}`;
+      document.getElementById('kpi-growth-pct-desc').textContent = `Año ant.: ${totalTeamProdAnt} → Act.: ${totalTeamProdAct}`;
+
       document.getElementById('kpi-total-complementary').textContent = totalComplementary;
       document.getElementById('kpi-bonus-qualified').textContent = advisorList.filter(a => a.ventasTrimestre >= metaBono).length;
       document.getElementById('kpi-total-advisors').textContent = advisorList.length;
+
       if (advisorList.length > 0 && advisorList[0].ventasPeriodo > 0) {
         document.getElementById('kpi-top-advisor').textContent = advisorList[0].name;
         document.getElementById('kpi-top-advisor-sales').textContent = `${advisorList[0].ventasPeriodo} afiliaciones`;
@@ -1129,17 +1456,39 @@
       document.getElementById('chart-legend-usuario').textContent = totalOtros;
       renderAdminCharts(monthlyOtros, monthlyFam, advisorList, metaBono, totalOtros, totalFam);
 
-      document.getElementById('admin-ranking-tbody').innerHTML = advisorList.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-slate-400">Sin asesores</td></tr>` : advisorList.map((a) => `
+      document.getElementById('admin-ranking-tbody').innerHTML = advisorList.length === 0 ? `<tr><td colspan="9" class="py-6 text-center text-slate-400">Sin asesores</td></tr>` : advisorList.map((a) => {
+        const m = a.metrics;
+        let netosBadge = '';
+        if (m.netosReales < 0) {
+          netosBadge = `<span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] font-bold">${formatSignedNumber(m.netosReales)} / +${m.metaNetos}</span>`;
+        } else if (m.cumpleNetos) {
+          netosBadge = `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">${formatSignedNumber(m.netosReales)} / +${m.metaNetos}</span>`;
+        } else {
+          netosBadge = `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold">${formatSignedNumber(m.netosReales)} / +${m.metaNetos}</span>`;
+        }
+
+        const growthColor = m.crecimientoUsuarios > 0 ? 'text-emerald-700' : (m.crecimientoUsuarios < 0 ? 'text-rose-600' : 'text-slate-600');
+
+        return `
         <tr class="hover:bg-slate-50/80">
           <td class="py-3 px-2"><span class="font-bold text-slate-900">${a.name}</span><span class="block text-[11px] text-slate-400">${a.phone}</span></td>
           <td class="py-3 px-2 text-center"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-900 font-mono text-xs font-bold">${a.password}</span></td>
           <td class="py-3 px-2 text-center font-bold">${a.ventasPeriodo}</td>
+          <td class="py-3 px-2 text-center">
+            ${netosBadge}
+            <span class="block text-[10px] text-slate-400 mt-0.5">Base ${m.carteraBase} → Act. ${m.carteraActual}</span>
+          </td>
+          <td class="py-3 px-2 text-center">
+            <span class="font-bold text-xs ${growthColor}">${formatSignedNumber(m.crecimientoUsuarios)} (${m.crecimientoUsuarios >= 0 ? '+' : ''}${m.crecimientoPct}%)</span>
+            <span class="block text-[10px] text-slate-400">Ant. ${m.prodAnterior} → Act. ${a.ventasAnio}</span>
+          </td>
           <td class="py-3 px-2 text-center font-bold text-sky-800">${a.compPeriodo}</td>
           <td class="py-3 px-2 text-center font-bold ${a.ventasTrimestre >= metaBono ? 'text-emerald-600' : ''}">${a.ventasTrimestre} / ${metaBono}</td>
-          <td class="py-3 px-2">${a.ventasTrimestre >= metaBono ? '<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Califica</span>' : '<span class="text-slate-500 text-xs">En proceso</span>'}</td>
-          <td class="py-3 px-2 text-right"><button onclick="openEditAdvisorModal('${a.phone}')" class="px-2 py-1 rounded bg-slate-100 text-xs font-semibold">Editar</button></td>
+          <td class="py-3 px-2">${a.ventasTrimestre >= metaBono ? '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">Califica</span>' : '<span class="text-slate-500 text-xs">En proceso</span>'}</td>
+          <td class="py-3 px-2 text-right"><button onclick="openEditAdvisorModal('${a.phone}')" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold transition">Editar</button></td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
 
       document.getElementById('admin-movements-count').textContent = `${periodReports.length} movimientos`;
       document.getElementById('admin-reports-tbody').innerHTML = periodReports.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-slate-400">Sin movimientos</td></tr>` : periodReports.map(r => {
@@ -1209,20 +1558,41 @@
       document.getElementById('adv-form-name').value = '';
       const pInput = document.getElementById('adv-form-phone'); pInput.value = ''; pInput.readOnly = false;
       document.getElementById('adv-form-pass').value = '';
-      document.getElementById('advisor-form-modal').classList.remove('hidden'); document.getElementById('advisor-form-modal').classList.add('flex');
+      document.getElementById('adv-form-mensual').value = CONFIG.DEFAULT_META_MENSUAL;
+      document.getElementById('adv-form-convencion').value = CONFIG.DEFAULT_META_CONVENCION;
+      document.getElementById('adv-form-cartera-base').value = 0;
+      document.getElementById('adv-form-meta-netos').value = CONFIG.DEFAULT_META_NETOS;
+      document.getElementById('adv-form-prod-ant').value = 0;
+      document.getElementById('adv-form-bajas').value = 0;
+      document.getElementById('advisor-form-modal').classList.remove('hidden');
+      document.getElementById('advisor-form-modal').classList.add('flex');
+      lucide.createIcons();
     }
+
     function openEditAdvisorModal(phone) {
       const raw = appState.asesores.find(a => String(a.phone).replace(/\D/g, '') === phone);
       if (!raw) return;
       const parsed = parseAdvisorRecord(raw);
-      document.getElementById('advisor-modal-title').textContent = 'Editar Asesor';
+      document.getElementById('advisor-modal-title').textContent = 'Editar Asesor & Metas Puntuales';
       document.getElementById('adv-form-mode').value = 'edit';
       document.getElementById('adv-form-name').value = parsed.cleanName;
       const pInput = document.getElementById('adv-form-phone'); pInput.value = parsed.phone; pInput.readOnly = true;
       document.getElementById('adv-form-pass').value = parsed.password;
-      document.getElementById('advisor-form-modal').classList.remove('hidden'); document.getElementById('advisor-form-modal').classList.add('flex');
+      document.getElementById('adv-form-mensual').value = parsed.metaMensual > 1000 ? CONFIG.DEFAULT_META_MENSUAL : (parsed.metaMensual || CONFIG.DEFAULT_META_MENSUAL);
+      document.getElementById('adv-form-convencion').value = parsed.metaConvencion > 10000 ? CONFIG.DEFAULT_META_CONVENCION : (parsed.metaConvencion || CONFIG.DEFAULT_META_CONVENCION);
+      document.getElementById('adv-form-cartera-base').value = parsed.carteraBase || 0;
+      document.getElementById('adv-form-meta-netos').value = parsed.metaNetos !== undefined ? parsed.metaNetos : CONFIG.DEFAULT_META_NETOS;
+      document.getElementById('adv-form-prod-ant').value = parsed.prodAnterior || 0;
+      document.getElementById('adv-form-bajas').value = parsed.bajas || 0;
+      document.getElementById('advisor-form-modal').classList.remove('hidden');
+      document.getElementById('advisor-form-modal').classList.add('flex');
+      lucide.createIcons();
     }
-    function closeAdvisorFormModal() { document.getElementById('advisor-form-modal').classList.add('hidden'); document.getElementById('advisor-form-modal').classList.remove('flex'); }
+
+    function closeAdvisorFormModal() {
+      document.getElementById('advisor-form-modal').classList.add('hidden');
+      document.getElementById('advisor-form-modal').classList.remove('flex');
+    }
 
     async function saveAdvisorForm(e) {
       e.preventDefault();
@@ -1232,13 +1602,34 @@
       const pass = document.getElementById('adv-form-pass').value.trim();
       const mens = Number(document.getElementById('adv-form-mensual').value);
       const conv = Number(document.getElementById('adv-form-convencion').value);
-      const encoded = encodeAdvisorNameWithPass(name, pass);
+      const carteraBase = Number(document.getElementById('adv-form-cartera-base').value) || 0;
+      const metaNetos = Number(document.getElementById('adv-form-meta-netos').value) || 0;
+      const prodAnterior = Number(document.getElementById('adv-form-prod-ant').value) || 0;
+      const bajas = Number(document.getElementById('adv-form-bajas').value) || 0;
+
+      const encoded = encodeAdvisorRecord(name, pass, carteraBase, metaNetos, prodAnterior, bajas);
       try {
-        const res = await apiCall({ action: mode === 'create' ? 'register_advisor' : 'update_advisor', phone, name: encoded, metaMensual: mens, metaConvencion: conv });
-        if (res && res.status === 'ok' && res.data) { appState.asesores = res.data.asesores; appState.reportes = res.data.reportes; }
-        else if (mode === 'create') { appState.asesores.push({ phone, name: encoded, metaMensual: mens, metaConvencion: conv }); }
-        else { const idx = appState.asesores.findIndex(a => String(a.phone).replace(/\D/g, '') === phone); if (idx > -1) appState.asesores[idx] = { phone, name: encoded, metaMensual: mens, metaConvencion: conv }; }
-        saveCache(); closeAdvisorFormModal(); refreshActiveView(); showToast('Asesor guardado.');
+        const res = await apiCall({
+          action: mode === 'create' ? 'register_advisor' : 'update_advisor',
+          phone,
+          name: encoded,
+          metaMensual: mens,
+          metaConvencion: conv,
+          carteraBase,
+          metaNetos,
+          prodAnterior,
+          bajas
+        });
+        if (res && res.status === 'ok' && res.data) {
+          appState.asesores = res.data.asesores;
+          appState.reportes = res.data.reportes;
+        } else if (mode === 'create') {
+          appState.asesores.push({ phone, name: encoded, metaMensual: mens, metaConvencion: conv, carteraBase, metaNetos, prodAnterior, bajas });
+        } else {
+          const idx = appState.asesores.findIndex(a => String(a.phone).replace(/\D/g, '') === phone);
+          if (idx > -1) appState.asesores[idx] = { phone, name: encoded, metaMensual: mens, metaConvencion: conv, carteraBase, metaNetos, prodAnterior, bajas };
+        }
+        saveCache(); closeAdvisorFormModal(); refreshActiveView(); showToast('Parámetros del asesor guardados.');
       } catch (err) { showToast('Error al guardar.', 'error'); }
     }
 
