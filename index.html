@@ -297,7 +297,7 @@
               <span id="adv-month-sales" class="font-display font-extrabold text-3xl text-slate-900">0</span>
               <span class="text-xs text-slate-500">meta: <span id="adv-month-target">5</span></span>
             </div>
-            <p class="text-[11px] text-slate-400 mt-0.5">Planes principales y ambulatoria</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Todo el portafolio (excepto Emer./S.Exp)</p>
           </div>
           <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
             <i data-lucide="calendar" class="w-5 h-5"></i>
@@ -312,7 +312,7 @@
               <span id="adv-comp-year-sales" class="font-display font-extrabold text-3xl text-sky-900">0</span>
               <span class="text-xs text-slate-500">año (<strong id="adv-comp-month-sales" class="text-sky-700">0</strong> mes)</span>
             </div>
-            <p class="text-[11px] text-slate-500 mt-0.5">Contador independiente (no suma a meta)</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Contador independiente (no suma a bono)</p>
           </div>
           <div class="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
             <i data-lucide="heart-pulse" class="w-5 h-5"></i>
@@ -400,13 +400,14 @@
               <div>
                 <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Producto / Ramo *</label>
                 <select id="rep-ramo" onchange="toggleProductHint()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                  <option value="Plan Alterno">Plan Alterno</option>
-                  <option value="Plan Original">Plan Original</option>
-                  <option value="Plan Ambulatorio">Plan Ambulatorio</option>
-                  <option value="Póliza Ambulatoria">Póliza Ambulatoria</option>
-                  <option value="Emermédica">Emermédica</option>
-                  <option value="Salud Express">Salud Express</option>
-                  <option value="AHC">AHC</option>
+                  <option value="Plan Alterno">Plan Alterno (Suma 1)</option>
+                  <option value="Plan Original">Plan Original (Suma 1)</option>
+                  <option value="Plan Ambulatorio">Plan Ambulatorio (0.33)</option>
+                  <option value="Póliza Ambulatoria">Póliza Ambulatoria (0.33)</option>
+                  <option value="AHC">AHC (Suma 1)</option>
+                  <option value="HC">HC (Suma 1)</option>
+                  <option value="Emermédica">Emermédica (Aparte)</option>
+                  <option value="Salud Express">Salud Express (Aparte)</option>
                 </select>
               </div>
 
@@ -414,6 +415,12 @@
                 <label id="rep-polizas-label" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Cantidad Usuarios *</label>
                 <input type="number" id="rep-polizas" required min="1" max="50" value="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
+            </div>
+
+            <!-- Aviso regla Plan Principal (Alterno, Original, AHC, HC) -->
+            <div id="standard-hint" class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-[11px] font-medium flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0 text-emerald-600"></i>
+              <span><strong>Suma 100% (1 punto por usuario):</strong> Este producto suma completo a tu <strong>Bono Trimestral</strong>, <strong>Convención Anual</strong> y <strong>Netos Positivos</strong>.</span>
             </div>
 
             <!-- Aviso regla Retiro / Cancelación -->
@@ -425,7 +432,7 @@
             <!-- Aviso regla Ambulatoria -->
             <div id="ambulatoria-hint" class="hidden p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-medium flex items-center gap-2">
               <i data-lucide="info" class="w-4 h-4 shrink-0 text-amber-600"></i>
-              <span><strong>Regla Ambulatoria activa:</strong> Cada unidad equivale a <strong>0.33</strong> afiliaciones (3 unidades = 1 afiliación).</span>
+              <span><strong>Regla Ambulatoria activa:</strong> Cada unidad suma <strong>0.33</strong> al Bono Trimestral y Convención (3 unidades = 1 afiliación).</span>
             </div>
 
             <!-- Aviso regla Emermédica / Salud Express -->
@@ -450,7 +457,7 @@
           <div class="flex items-center justify-between mb-4">
             <div>
               <h3 class="font-display font-bold text-lg text-slate-900">Mis Movimientos Reportados</h3>
-              <p class="text-xs text-slate-500">Afiliaciones (+), Retiros (- Netos) y Ambulatoria (0.33)</p>
+              <p class="text-xs text-slate-500">Portafolio completo (+1), Ambulatoria (+0.33), Retiros (- Netos) y Emermédica (Aparte)</p>
             </div>
             <span id="adv-history-count" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">0 registros</span>
           </div>
@@ -463,7 +470,7 @@
                   <th class="py-3 px-2">Cliente</th>
                   <th class="py-3 px-2">Movimiento</th>
                   <th class="py-3 px-2">Producto</th>
-                  <th class="py-3 px-2 text-center">Cant. / Impacto</th>
+                  <th class="py-3 px-2 text-center">Pts. Bono/Conv.</th>
                   <th class="py-3 px-2 text-right">Borrar</th>
                 </tr>
               </thead>
@@ -481,7 +488,7 @@
       <div class="bg-white rounded-3xl p-5 border border-slate-100 card-shadow flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <h1 class="font-display font-bold text-xl sm:text-2xl text-slate-900">Tablero de Dirección Comercial</h1>
-          <p class="text-xs sm:text-sm text-slate-500">Parametrización de metas, Netos Positivos de cartera (incluye retiros) y Crecimiento vs. Año Anterior.</p>
+          <p class="text-xs sm:text-sm text-slate-500">Parametrización de metas, Netos Positivos de cartera y Crecimiento vs. Año Anterior.</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
@@ -688,7 +695,7 @@
                 <th class="py-3 px-2">Cliente</th>
                 <th class="py-3 px-2">Movimiento</th>
                 <th class="py-3 px-2">Producto</th>
-                <th class="py-3 px-2 text-center">Cant. / Impacto</th>
+                <th class="py-3 px-2 text-center">Pts. Bono/Conv.</th>
                 <th class="py-3 px-2 text-right">Acción</th>
               </tr>
             </thead>
@@ -842,6 +849,7 @@
         .trim();
     }
 
+    // Detecta Retiros / Cancelaciones (restan de Netos Positivos, no alteran bono trimestral)
     function isRetiroReport(rep) {
       const combined = `${normalizeText(rep.ramo)} ${normalizeText(rep.tipoVenta)}`;
       return combined.includes('retiro') || combined.includes('cancelacion');
@@ -857,17 +865,20 @@
       return qty;
     }
 
+    // ÚNICOS productos excluidos del Bono Trimestral y Convención: Emermédica y Salud Express
     function isComplementaryReport(rep) {
       if (isRetiroReport(rep)) return false;
       const combined = `${normalizeText(rep.ramo)} ${normalizeText(rep.tipoVenta)}`;
       return combined.includes('emermedica') || combined.includes('salud express');
     }
 
+    // Pólizas / Planes Ambulatorios: suman 0.33 por unidad (3 = 1 afiliación)
     function isAmbulatoriaReport(rep) {
       const combined = `${normalizeText(rep.ramo)} ${normalizeText(rep.tipoVenta)}`;
       return combined.includes('ambulatori');
     }
 
+    // TODO el resto del portafolio (Plan Original, Plan Alterno, AHC, HC, etc.) suma 1 punto por usuario al Bono Trimestral y Convención
     function getEffectiveSales(rep) {
       if (isRetiroReport(rep)) return 0;
       if (isComplementaryReport(rep)) return 0;
@@ -904,6 +915,7 @@
       const isRetiro = normalizeText(selectedTipo).includes('retiro');
       const norm = normalizeText(document.getElementById('rep-ramo').value);
 
+      const standardHint = document.getElementById('standard-hint');
       const retiroHint = document.getElementById('retiro-hint');
       const ambHint = document.getElementById('ambulatoria-hint');
       const compHint = document.getElementById('complementary-hint');
@@ -912,17 +924,19 @@
       const formTitle = document.getElementById('rep-form-title');
       const formIconBox = document.getElementById('rep-form-icon-box');
 
+      standardHint.classList.add('hidden');
+      retiroHint.classList.add('hidden');
+      ambHint.classList.add('hidden');
+      compHint.classList.add('hidden');
+
       if (isRetiro) {
         retiroHint.classList.remove('hidden');
-        ambHint.classList.add('hidden');
-        compHint.classList.add('hidden');
         submitBtn.className = "w-full py-3.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm";
         submitBtnText.textContent = "Registrar Retiro / Baja";
         formTitle.textContent = "Registrar Retiro de Usuario";
         formIconBox.className = "w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center";
         return;
       } else {
-        retiroHint.classList.add('hidden');
         submitBtn.className = "w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm";
         submitBtnText.textContent = "Guardar Venta en Sistema";
         formTitle.textContent = "Reportar Movimiento";
@@ -931,13 +945,10 @@
 
       if (norm.includes('ambulatori')) {
         ambHint.classList.remove('hidden');
-        compHint.classList.add('hidden');
       } else if (norm.includes('emermedica') || norm.includes('salud express')) {
         compHint.classList.remove('hidden');
-        ambHint.classList.add('hidden');
       } else {
-        ambHint.classList.add('hidden');
-        compHint.classList.add('hidden');
+        standardHint.classList.remove('hidden');
       }
     }
 
@@ -1101,13 +1112,13 @@
 
     function loadCache() {
       try {
-        const cached = localStorage.getItem('elite_comercial_cache_v10');
+        const cached = localStorage.getItem('elite_comercial_cache_v11');
         if (cached) { const p = JSON.parse(cached); appState.asesores = p.asesores || []; appState.reportes = p.reportes || []; }
       } catch (e) {}
     }
 
     function saveCache() {
-      try { localStorage.setItem('elite_comercial_cache_v10', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
+      try { localStorage.setItem('elite_comercial_cache_v11', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
     }
 
     function updateConnectionIndicator() {
@@ -1252,23 +1263,20 @@
 
       myReports.forEach(r => {
         const { year, monthNum } = parseDateParts(r.fecha);
-        const effQty = getEffectiveSales(r);
+        const effQty = getEffectiveSales(r); // Suma Plan Original, Plan Alterno, AHC, HC (1 c/u) + Ambulatoria (0.33 c/u); excluye Emermédica/Salud Express
         const compQty = getComplementarySales(r);
         const retiroQty = getRetiroSales(r);
 
         if (year === curYear) {
-          // Convención Anual suma todo el año en curso
           yearSales += effQty;
           compYearSales += compQty;
           yearRetiros += retiroQty;
 
-          // Mes actual
           if (monthNum === curMonth) {
             monthSales += effQty;
             compMonthSales += compQty;
           }
 
-          // Bono Trimestral: suma ÚNICAMENTE los 3 meses pertenecientes al trimestre seleccionado
           if (isMonthInQuarter(monthNum, selectedQuarter)) {
             quarterSales += effQty;
           }
@@ -1289,7 +1297,7 @@
       const faltanViaje = formatScore(Math.max(0, metaConv - yearSales));
       document.getElementById('adv-conv-status').textContent = yearSales >= metaConv ? '¡Meta Cumplida!' : `${faltanViaje} para el viaje`;
 
-      // Bono Trimestral (Independiente por trimestre seleccionado)
+      // Bono Trimestral (Independiente por trimestre seleccionado - incluye todo el portafolio excepto Emermédica/Salud Express)
       document.getElementById('adv-quarter-sales').textContent = quarterSales;
       const bonusPct = Math.min(100, Math.round((quarterSales / metaBono) * 100));
       document.getElementById('adv-bonus-bar').style.width = `${bonusPct}%`;
@@ -1401,7 +1409,7 @@
           const isRet = isRetiroReport(r);
           const isAmb = isAmbulatoriaReport(r);
           const isComp = isComplementaryReport(r);
-          let qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span>`;
+          let qtyDisplay = `<span class="font-bold text-emerald-700">+${effQty}</span> <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 text-[10px] font-bold">Suma 100%</span>`;
           let prodBadge = '';
 
           if (isRet) {
@@ -1409,9 +1417,9 @@
             prodBadge = `<span class="text-[10px] font-bold text-rose-600">(Baja cartera)</span>`;
           } else if (isComp) {
             qtyDisplay = `<span class="font-bold text-sky-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-bold">Aparte</span>`;
-            prodBadge = `<span class="text-[10px] font-bold text-sky-700">(No suma meta)</span>`;
+            prodBadge = `<span class="text-[10px] font-bold text-sky-700">(No suma bono)</span>`;
           } else if (isAmb) {
-            qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">${effQty}</span>`;
+            qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">+${effQty}</span>`;
             prodBadge = `<span class="text-[10px] font-bold text-amber-700">(0.33 c/u)</span>`;
           }
 
@@ -1461,7 +1469,7 @@
         document.getElementById('rep-cliente').value = '';
         document.getElementById('rep-polizas').value = '1';
         renderAdvisorDashboard();
-        showToast(isRetiro ? 'Retiro registrado y descontado de tus netos.' : 'Venta registrada y netos actualizados.', isRetiro ? 'warning' : 'success');
+        showToast(isRetiro ? 'Retiro registrado y descontado de tus netos.' : 'Venta registrada y sumada a tu bono trimestral.', isRetiro ? 'warning' : 'success');
       } catch (err) {
         appState.reportes.push(newRep); saveCache(); renderAdvisorDashboard(); showToast('Guardado localmente.', 'warning');
       } finally {
@@ -1549,7 +1557,6 @@
         advisorMap[p].ventasAnio = fixTriples(advisorMap[p].ventasAnio + qty);
         advisorMap[p].retirosAnio = fixTriples(advisorMap[p].retirosAnio + retQty);
 
-        // Solo suma ventas del trimestre seleccionado (independiente por trimestre)
         if (isMonthInQuarter(monthNum, selQuarter)) {
           advisorMap[p].ventasTrimestre = fixTriples(advisorMap[p].ventasTrimestre + qty);
         }
@@ -1644,7 +1651,7 @@
         const isRet = isRetiroReport(r);
         const isAmb = isAmbulatoriaReport(r);
         const isComp = isComplementaryReport(r);
-        let qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span>`;
+        let qtyDisplay = `<span class="font-bold text-emerald-700">+${effQty}</span> <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 text-[10px] font-bold">100%</span>`;
         let prodBadge = '';
 
         if (isRet) {
@@ -1652,9 +1659,9 @@
           prodBadge = `<span class="text-[10px] font-bold text-rose-600">(Baja cartera)</span>`;
         } else if (isComp) {
           qtyDisplay = `<span class="font-bold text-sky-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-bold">Aparte</span>`;
-          prodBadge = `<span class="text-[10px] font-bold text-sky-700">(No suma meta)</span>`;
+          prodBadge = `<span class="text-[10px] font-bold text-sky-700">(No suma bono)</span>`;
         } else if (isAmb) {
-          qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">${effQty}</span>`;
+          qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[11px] font-bold">+${effQty}</span>`;
           prodBadge = `<span class="text-[10px] font-bold text-amber-700">(0.33 c/u)</span>`;
         }
 
@@ -1791,7 +1798,7 @@
       updateConnectionIndicator(); closeSheetsModal(); await syncWithSheets(true);
     }
     function exportReportsCSV() {
-      const csv = '\uFEFF' + ['Fecha,Trimestre,Asesor,Cliente,Movimiento,Producto,Cantidad_Reportada,Afiliaciones_Meta,Retiros_Netos,Emermedica_SaludExpress'].join(',') + '\n' + appState.reportes.map(r => {
+      const csv = '\uFEFF' + ['Fecha,Trimestre,Asesor,Cliente,Movimiento,Producto,Cantidad_Reportada,Pts_Bono_Convencion,Retiros_Netos,Emermedica_SaludExpress'].join(',') + '\n' + appState.reportes.map(r => {
         const { monthNum } = parseDateParts(r.fecha);
         const q = monthNum >= 1 && monthNum <= 12 ? getQuarterFromMonth(monthNum) : '';
         return `${String(r.fecha).slice(0, 10)},${q},"${cleanAdvisorDisplay(r.asesor)}","${r.cliente}",${parseTipoVenta(r)},"${cleanProductoName(r)}",${r.polizas || 1},${getEffectiveSales(r)},${getRetiroSales(r)},${getComplementarySales(r)}`;
