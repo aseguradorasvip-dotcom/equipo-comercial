@@ -217,7 +217,7 @@
 
       </div>
 
-      <!-- NUEVA FILA: NETOS POSITIVOS DE CARTERA Y CRECIMIENTO VS AÑO ANTERIOR -->
+      <!-- FILA DE NETOS POSITIVOS DE CARTERA Y CRECIMIENTO VS AÑO ANTERIOR -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Tarjeta Netos Positivos -->
         <div id="adv-netos-card" class="bg-white rounded-2xl p-5 border border-slate-100 card-shadow flex flex-col justify-between">
@@ -243,7 +243,7 @@
             </div>
             <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-1">
               <span>Base cierre ant.: <strong id="adv-cartera-base" class="text-slate-700">0</strong></span>
-              <span>Cartera actual: <strong id="adv-cartera-actual" class="text-slate-900">0</strong> <span id="adv-bajas-info" class="text-rose-600"></span></span>
+              <span>Cartera actual: <strong id="adv-cartera-actual" class="text-slate-900">0</strong> <span id="adv-bajas-info" class="text-rose-600 font-semibold"></span></span>
             </div>
             <p id="adv-netos-hint" class="text-[11px] text-slate-500">Piso mínimo para cumplir netos: <strong id="adv-cartera-piso" class="text-slate-800">20</strong> usuarios activos.</p>
           </div>
@@ -326,51 +326,59 @@
         </div>
       </div>
 
-      <!-- Formulario y Mis Ventas -->
+      <!-- Formulario (Ventas y Retiros) y Mis Movimientos -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         <!-- Formulario -->
         <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 card-shadow h-fit">
           <div class="flex items-center gap-2.5 mb-5">
-            <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <div id="rep-form-icon-box" class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
               <i data-lucide="plus-circle" class="w-5 h-5"></i>
             </div>
             <div>
-              <h2 class="font-display font-bold text-lg text-slate-900">Reportar Nueva Venta</h2>
-              <p class="text-xs text-slate-500">Registra tus cierres efectivos</p>
+              <h2 id="rep-form-title" class="font-display font-bold text-lg text-slate-900">Reportar Movimiento</h2>
+              <p class="text-xs text-slate-500">Registra afiliaciones nuevas o retiros de cartera</p>
             </div>
           </div>
 
           <form onsubmit="handleAddReport(event)" class="space-y-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Tipo de Venta *</label>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Tipo de Movimiento *</label>
               <div class="grid grid-cols-2 gap-2">
                 <label class="cursor-pointer">
-                  <input type="radio" name="tipo-venta" value="Usuario Familiar" checked class="peer sr-only" />
+                  <input type="radio" name="tipo-venta" value="Usuario Familiar" checked onchange="toggleProductHint()" class="peer sr-only" />
                   <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-indigo-600 peer-checked:bg-indigo-50/70 transition flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 peer-checked:text-indigo-800">
                     <i data-lucide="users" class="w-3.5 h-3.5 shrink-0"></i>
                     <span>Usuario Familiar</span>
                   </div>
                 </label>
                 <label class="cursor-pointer">
-                  <input type="radio" name="tipo-venta" value="Usuario Colectivo" class="peer sr-only" />
+                  <input type="radio" name="tipo-venta" value="Usuario Colectivo" onchange="toggleProductHint()" class="peer sr-only" />
                   <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-emerald-600 peer-checked:bg-emerald-50/70 transition flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 peer-checked:text-emerald-800">
                     <i data-lucide="building-2" class="w-3.5 h-3.5 shrink-0"></i>
                     <span>Usuario Colectivo</span>
                   </div>
                 </label>
                 <label class="cursor-pointer">
-                  <input type="radio" name="tipo-venta" value="Rehabilitación" class="peer sr-only" />
+                  <input type="radio" name="tipo-venta" value="Rehabilitación" onchange="toggleProductHint()" class="peer sr-only" />
                   <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-amber-600 peer-checked:bg-amber-50/70 transition flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 peer-checked:text-amber-800">
                     <i data-lucide="refresh-ccw" class="w-3.5 h-3.5 shrink-0"></i>
                     <span>Rehabilitación</span>
                   </div>
                 </label>
                 <label class="cursor-pointer">
-                  <input type="radio" name="tipo-venta" value="Plan Retorno" class="peer sr-only" />
+                  <input type="radio" name="tipo-venta" value="Plan Retorno" onchange="toggleProductHint()" class="peer sr-only" />
                   <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-sky-600 peer-checked:bg-sky-50/70 transition flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 peer-checked:text-sky-800">
                     <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 shrink-0"></i>
                     <span>Plan Retorno</span>
+                  </div>
+                </label>
+                <!-- NUEVA OPCIÓN PARA ASESORES: RETIRO / CANCELACIÓN -->
+                <label class="cursor-pointer col-span-2">
+                  <input type="radio" name="tipo-venta" value="Retiro / Cancelación" onchange="toggleProductHint()" class="peer sr-only" />
+                  <div class="p-2.5 rounded-xl border-2 border-slate-200 peer-checked:border-rose-600 peer-checked:bg-rose-50 transition flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 peer-checked:text-rose-800">
+                    <i data-lucide="user-minus" class="w-4 h-4 shrink-0 text-rose-600"></i>
+                    <span>Retiro / Cancelación de Usuario (Resta Netos)</span>
                   </div>
                 </label>
               </div>
@@ -396,9 +404,15 @@
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Cantidad Pólizas *</label>
+                <label id="rep-polizas-label" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Cantidad Usuarios *</label>
                 <input type="number" id="rep-polizas" required min="1" max="50" value="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
               </div>
+            </div>
+
+            <!-- Aviso regla Retiro / Cancelación -->
+            <div id="retiro-hint" class="hidden p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-[11px] font-medium flex items-center gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-rose-600"></i>
+              <span><strong>Registro de Retiro:</strong> Descuenta directamente de tu <strong>Cartera Actual</strong> y de tus <strong>Netos Positivos</strong> (no altera tu conteo bruto de Convención/Bono).</span>
             </div>
 
             <!-- Aviso regla Ambulatoria -->
@@ -414,13 +428,13 @@
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Fecha de Cierre *</label>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Fecha del Movimiento *</label>
               <input type="date" id="rep-fecha" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
 
             <button type="submit" id="btn-submit-report" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
               <i data-lucide="send" class="w-4 h-4"></i>
-              <span>Guardar Venta en Sistema</span>
+              <span id="btn-submit-report-text">Guardar Venta en Sistema</span>
             </button>
           </form>
         </div>
@@ -428,8 +442,8 @@
         <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="font-display font-bold text-lg text-slate-900">Mis Ventas Reportadas</h3>
-              <p class="text-xs text-slate-500">Ambulatoria = 0.33 · Emermédica/Salud Express = Contador aparte</p>
+              <h3 class="font-display font-bold text-lg text-slate-900">Mis Movimientos Reportados</h3>
+              <p class="text-xs text-slate-500">Afiliaciones (+), Retiros (- Netos) y Ambulatoria (0.33)</p>
             </div>
             <span id="adv-history-count" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">0 registros</span>
           </div>
@@ -440,9 +454,9 @@
                 <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   <th class="py-3 px-2">Fecha</th>
                   <th class="py-3 px-2">Cliente</th>
-                  <th class="py-3 px-2">Tipo</th>
+                  <th class="py-3 px-2">Movimiento</th>
                   <th class="py-3 px-2">Producto</th>
-                  <th class="py-3 px-2 text-center">Cant. / Equiv.</th>
+                  <th class="py-3 px-2 text-center">Cant. / Impacto</th>
                   <th class="py-3 px-2 text-right">Borrar</th>
                 </tr>
               </thead>
@@ -460,7 +474,7 @@
       <div class="bg-white rounded-3xl p-5 border border-slate-100 card-shadow flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <h1 class="font-display font-bold text-xl sm:text-2xl text-slate-900">Tablero de Dirección Comercial</h1>
-          <p class="text-xs sm:text-sm text-slate-500">Parametrización de metas, Netos Positivos de cartera y Crecimiento vs. Año Anterior.</p>
+          <p class="text-xs sm:text-sm text-slate-500">Parametrización de metas, Netos Positivos de cartera (incluye retiros) y Crecimiento vs. Año Anterior.</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
@@ -513,7 +527,7 @@
         </div>
       </div>
 
-      <!-- KPIs Dirección (6 columnas responsivas: Metas, Netos Equipo, Crec. vs Año Ant., Emermédica, Bono Trimestral, Líder) -->
+      <!-- KPIs Dirección (6 columnas responsivas) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <div class="bg-white rounded-2xl p-4 border border-slate-100 card-shadow">
           <div class="flex items-center justify-between text-slate-500 text-[11px] font-semibold uppercase">
@@ -526,7 +540,7 @@
           <p id="kpi-periodo-desc" class="text-[11px] text-slate-500 mt-1">Convención y Bono</p>
         </div>
 
-        <!-- NUEVO KPI DIRECTOR: NETOS POSITIVOS EQUIPO -->
+        <!-- KPI DIRECTOR: NETOS POSITIVOS EQUIPO -->
         <div class="bg-white rounded-2xl p-4 border border-indigo-100 card-shadow">
           <div class="flex items-center justify-between text-indigo-700 text-[11px] font-semibold uppercase">
             <span>Netos del Equipo</span>
@@ -538,7 +552,7 @@
           <p id="kpi-netos-qualified-desc" class="text-[11px] text-slate-500 mt-1">0 cumplen meta netos</p>
         </div>
 
-        <!-- NUEVO KPI DIRECTOR: CRECIMIENTO VS AÑO ANTERIOR -->
+        <!-- KPI DIRECTOR: CRECIMIENTO VS AÑO ANTERIOR -->
         <div class="bg-white rounded-2xl p-4 border border-emerald-100 card-shadow">
           <div class="flex items-center justify-between text-emerald-700 text-[11px] font-semibold uppercase">
             <span>Crec. vs Año Ant.</span>
@@ -625,7 +639,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
               <h2 class="font-display font-bold text-base sm:text-lg text-slate-900">Equipo Comercial, Netos & Crecimiento</h2>
-              <p class="text-xs text-slate-500">Haz clic en "Editar / Metas" para ajustar cartera base, meta de netos y producción anterior de cada asesor</p>
+              <p class="text-xs text-slate-500">Haz clic en "Editar" para ajustar cartera base, meta de netos y producción anterior de cada asesor</p>
             </div>
             <button onclick="openCreateAdvisorModal()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition self-start">+ Nuevo Asesor</button>
           </div>
@@ -653,7 +667,7 @@
       <div class="bg-white rounded-3xl p-6 border border-slate-100 card-shadow">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">Detalle de Movimientos</h3>
+            <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">Detalle de Movimientos (Ventas & Retiros)</h3>
             <p class="text-xs text-slate-500">Control y eliminación de reportes</p>
           </div>
           <span id="admin-movements-count" class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">0 movimientos</span>
@@ -665,9 +679,9 @@
                 <th class="py-3 px-2">Fecha</th>
                 <th class="py-3 px-2">Asesor</th>
                 <th class="py-3 px-2">Cliente</th>
-                <th class="py-3 px-2">Tipo Venta</th>
+                <th class="py-3 px-2">Movimiento</th>
                 <th class="py-3 px-2">Producto</th>
-                <th class="py-3 px-2 text-center">Cant. / Equiv.</th>
+                <th class="py-3 px-2 text-center">Cant. / Impacto</th>
                 <th class="py-3 px-2 text-right">Acción</th>
               </tr>
             </thead>
@@ -744,9 +758,9 @@
               <span class="text-[10px] text-slate-500 block mt-0.5">Total afiliaciones año pasado</span>
             </div>
             <div>
-              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Bajas / Cancelaciones Acum.</label>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Bajas Iniciales / Ajuste Dir.</label>
               <input type="number" id="adv-form-bajas" required min="0" value="0" placeholder="Ej. 0" class="w-full px-3 py-2 bg-white border border-rose-200 rounded-xl text-sm font-bold text-rose-900" />
-              <span class="text-[10px] text-slate-500 block mt-0.5">Retiros descontados este año</span>
+              <span class="text-[10px] text-slate-500 block mt-0.5">Se suma a retiros del asesor</span>
             </div>
           </div>
         </div>
@@ -791,8 +805,26 @@
         .trim();
     }
 
+    // Detecta si el movimiento es un Retiro / Cancelación reportado
+    function isRetiroReport(rep) {
+      const combined = `${normalizeText(rep.ramo)} ${normalizeText(rep.tipoVenta)}`;
+      return combined.includes('retiro') || combined.includes('cancelacion');
+    }
+
+    // Devuelve la cantidad de usuarios retirados (para restar de Cartera Activa y Netos Positivos)
+    function getRetiroSales(rep) {
+      if (!isRetiroReport(rep)) return 0;
+      const qty = Number(rep.polizas) || 1;
+      if (isAmbulatoriaReport(rep)) {
+        if (qty % 3 === 0) return qty / 3;
+        return Number((qty * 0.33).toFixed(2));
+      }
+      return qty;
+    }
+
     // Detecta Emermédica y Salud Express (van a contador aparte, NO suman a Convención ni Bono Trimestral)
     function isComplementaryReport(rep) {
+      if (isRetiroReport(rep)) return false;
       const combined = `${normalizeText(rep.ramo)} ${normalizeText(rep.tipoVenta)}`;
       return combined.includes('emermedica') || combined.includes('salud express');
     }
@@ -803,8 +835,9 @@
       return combined.includes('ambulatori');
     }
 
-    // Devuelve los puntos válidos para Convención Anual, Bono Trimestral y Meta Mensual
+    // Devuelve los puntos válidos para Convención Anual, Bono Trimestral y Meta Mensual (Retiros no suman ventas nuevas)
     function getEffectiveSales(rep) {
+      if (isRetiroReport(rep)) return 0;
       if (isComplementaryReport(rep)) return 0;
       const qty = Number(rep.polizas) || 1;
       if (isAmbulatoriaReport(rep)) {
@@ -836,9 +869,34 @@
     }
 
     function toggleProductHint() {
+      const selectedTipo = document.querySelector('input[name="tipo-venta"]:checked')?.value || '';
+      const isRetiro = normalizeText(selectedTipo).includes('retiro');
       const norm = normalizeText(document.getElementById('rep-ramo').value);
+
+      const retiroHint = document.getElementById('retiro-hint');
       const ambHint = document.getElementById('ambulatoria-hint');
       const compHint = document.getElementById('complementary-hint');
+      const submitBtn = document.getElementById('btn-submit-report');
+      const submitBtnText = document.getElementById('btn-submit-report-text');
+      const formTitle = document.getElementById('rep-form-title');
+      const formIconBox = document.getElementById('rep-form-icon-box');
+
+      if (isRetiro) {
+        retiroHint.classList.remove('hidden');
+        ambHint.classList.add('hidden');
+        compHint.classList.add('hidden');
+        submitBtn.className = "w-full py-3.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm";
+        submitBtnText.textContent = "Registrar Retiro / Baja";
+        formTitle.textContent = "Registrar Retiro de Usuario";
+        formIconBox.className = "w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center";
+        return;
+      } else {
+        retiroHint.classList.add('hidden');
+        submitBtn.className = "w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg transition flex items-center justify-center gap-2 text-sm";
+        submitBtnText.textContent = "Guardar Venta en Sistema";
+        formTitle.textContent = "Reportar Movimiento";
+        formIconBox.className = "w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center";
+      }
 
       if (norm.includes('ambulatori')) {
         ambHint.classList.remove('hidden');
@@ -852,8 +910,6 @@
       }
     }
 
-    // Codifica y decodifica parámetros individuales (PW, Cartera Base, Meta Netos, Producción Año Ant., Bajas)
-    // directamente en el campo name para 100% compatibilidad sin modificar el Google Apps Script
     function parseAdvisorRecord(rawAdv) {
       const rawName = String(rawAdv.name || '').trim();
       let cleanName = rawName;
@@ -905,16 +961,17 @@
       return String(rawName || '').replace(/\s*\[(PW|CB|MN|PA|BJ):[^\]]+\]/g, '').trim();
     }
 
-    // Cálculo centralizado de Netos Positivos y Crecimiento vs Año Anterior por asesor
-    function computeAdvisorMetrics(parsedAdv, yearSales) {
+    // Cálculo centralizado de Netos Positivos (incluyendo bajas parametrizadas + retiros reportados por el asesor)
+    function computeAdvisorMetrics(parsedAdv, yearSales, yearRetiros = 0) {
       const carteraBase = Number(parsedAdv.carteraBase) || 0;
       const metaNetos = Number(parsedAdv.metaNetos) || 0;
       const prodAnterior = Number(parsedAdv.prodAnterior) || 0;
-      const bajas = Number(parsedAdv.bajas) || 0;
+      const bajasBaseDir = Number(parsedAdv.bajas) || 0;
+      const totalBajas = fixTriples(bajasBaseDir + (Number(yearRetiros) || 0));
 
-      // Cartera Actual = Cartera Base + Afiliaciones efectivas del año - Bajas del año
-      const carteraActual = fixTriples(Math.max(0, carteraBase + yearSales - bajas));
-      // Netos Reales = Cartera Actual - Cartera Base (equivale a yearSales - bajas)
+      // Cartera Actual = Cartera Base + Afiliaciones efectivas del año - Total Bajas (Director + Retiros Asesor)
+      const carteraActual = fixTriples(Math.max(0, carteraBase + yearSales - totalBajas));
+      // Netos Reales = Cartera Actual - Cartera Base
       const netosReales = fixTriples(carteraActual - carteraBase);
       const pisoCartera = fixTriples(carteraBase + metaNetos);
       const cumpleNetos = netosReales >= metaNetos;
@@ -932,7 +989,7 @@
         metaNetos,
         pisoCartera,
         cumpleNetos,
-        bajas,
+        bajas: totalBajas,
         prodAnterior,
         crecimientoUsuarios,
         crecimientoPct
@@ -973,7 +1030,7 @@
 
     function parseTipoVenta(rep) {
       const rawRamo = String(rep.ramo || "");
-      const match = rawRamo.match(/^\[(Usuario Familiar|Usuario Colectivo|Rehabilitación|Plan Retorno|Usuario|Familiar)\]/i);
+      const match = rawRamo.match(/^\[(Usuario Familiar|Usuario Colectivo|Rehabilitación|Plan Retorno|Retiro \/ Cancelación|Usuario|Familiar)\]/i);
       if (match) {
         const val = match[1];
         if (/^Familiar$/i.test(val)) return "Usuario Familiar";
@@ -987,6 +1044,7 @@
 
     function getTipoBadgeHtml(tipo) {
       const t = String(tipo || "Usuario Familiar");
+      if (/retiro|cancelaci/i.test(t)) return `<span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-xs font-bold">${t}</span>`;
       if (/familiar/i.test(t)) return `<span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold">${t}</span>`;
       if (/colectivo/i.test(t)) return `<span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold">${t}</span>`;
       if (/rehabilitaci/i.test(t)) return `<span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-xs font-semibold">${t}</span>`;
@@ -1007,13 +1065,13 @@
 
     function loadCache() {
       try {
-        const cached = localStorage.getItem('elite_comercial_cache_v8');
+        const cached = localStorage.getItem('elite_comercial_cache_v9');
         if (cached) { const p = JSON.parse(cached); appState.asesores = p.asesores || []; appState.reportes = p.reportes || []; }
       } catch (e) {}
     }
 
     function saveCache() {
-      try { localStorage.setItem('elite_comercial_cache_v8', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
+      try { localStorage.setItem('elite_comercial_cache_v9', JSON.stringify({ asesores: appState.asesores, reportes: appState.reportes })); } catch (e) {}
     }
 
     function updateConnectionIndicator() {
@@ -1144,14 +1202,17 @@
 
       let monthSales = 0, yearSales = 0, quarterSales = 0;
       let compMonthSales = 0, compYearSales = 0;
+      let yearRetiros = 0;
 
       myReports.forEach(r => {
         const parts = String(r.fecha || '').split('-');
         const effQty = getEffectiveSales(r);
         const compQty = getComplementarySales(r);
+        const retiroQty = getRetiroSales(r);
         if (parts[0] === curYear) {
           yearSales += effQty;
           compYearSales += compQty;
+          yearRetiros += retiroQty;
           if (Number(parts[1]) === curMonth) {
             monthSales += effQty;
             compMonthSales += compQty;
@@ -1165,8 +1226,9 @@
       yearSales = fixTriples(yearSales);
       monthSales = fixTriples(monthSales);
       quarterSales = fixTriples(quarterSales);
+      yearRetiros = fixTriples(yearRetiros);
 
-      // Convención (NO incluye Emermédica / Salud Express)
+      // Convención (NO incluye Emermédica / Salud Express ni retiros)
       document.getElementById('adv-conv-target-num').textContent = metaConv;
       document.getElementById('adv-year-sales').textContent = yearSales;
       const convPct = Math.min(100, Math.round((yearSales / metaConv) * 100));
@@ -1175,7 +1237,7 @@
       const faltanViaje = formatScore(Math.max(0, metaConv - yearSales));
       document.getElementById('adv-conv-status').textContent = yearSales >= metaConv ? '¡Meta Cumplida!' : `${faltanViaje} para el viaje`;
 
-      // Bono Trimestral (NO incluye Emermédica / Salud Express)
+      // Bono Trimestral
       document.getElementById('adv-quarter-sales').textContent = quarterSales;
       const bonusPct = Math.min(100, Math.round((quarterSales / metaBono) * 100));
       document.getElementById('adv-bonus-bar').style.width = `${bonusPct}%`;
@@ -1200,10 +1262,9 @@
         bonusCard.classList.remove('monetary-glow');
       }
 
-      // --- NUEVOS INDICADORES ASESOR: NETOS POSITIVOS Y CRECIMIENTO VS AÑO ANTERIOR ---
-      const metrics = computeAdvisorMetrics(advisor, yearSales);
+      // --- INDICADORES ASESOR: NETOS POSITIVOS (CON RETIROS) Y CRECIMIENTO VS AÑO ANTERIOR ---
+      const metrics = computeAdvisorMetrics(advisor, yearSales, yearRetiros);
 
-      // 1. Netos Positivos
       const netosRealEl = document.getElementById('adv-netos-real');
       const netosBadgeEl = document.getElementById('adv-netos-badge');
       const netosBarEl = document.getElementById('adv-netos-bar');
@@ -1214,7 +1275,7 @@
       document.getElementById('adv-cartera-base').textContent = metrics.carteraBase;
       document.getElementById('adv-cartera-actual').textContent = metrics.carteraActual;
       document.getElementById('adv-cartera-piso').textContent = metrics.pisoCartera;
-      document.getElementById('adv-bajas-info').textContent = metrics.bajas > 0 ? `(-${metrics.bajas} bajas)` : '';
+      document.getElementById('adv-bajas-info').textContent = metrics.bajas > 0 ? `(-${metrics.bajas} retiros)` : '';
 
       const netosPct = metrics.metaNetos > 0
         ? Math.max(0, Math.min(100, Math.round((metrics.netosReales / metrics.metaNetos) * 100)))
@@ -1242,7 +1303,7 @@
         netosIconBox.className = "w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0";
       }
 
-      // 2. Crecimiento vs Año Anterior
+      // Crecimiento vs Año Anterior
       const growthDiffEl = document.getElementById('adv-growth-diff');
       const growthBadgeEl = document.getElementById('adv-growth-badge');
       const growthIconBox = document.getElementById('adv-growth-icon-box');
@@ -1282,12 +1343,17 @@
         tbody.innerHTML = [...myReports].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))).map(r => {
           const rawQty = Number(r.polizas) || 1;
           const effQty = getEffectiveSales(r);
+          const retQty = getRetiroSales(r);
+          const isRet = isRetiroReport(r);
           const isAmb = isAmbulatoriaReport(r);
           const isComp = isComplementaryReport(r);
           let qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span>`;
           let prodBadge = '';
 
-          if (isComp) {
+          if (isRet) {
+            qtyDisplay = `<span class="font-bold text-rose-700">-${retQty}</span> <span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Neto</span>`;
+            prodBadge = `<span class="text-[10px] font-bold text-rose-600">(Baja cartera)</span>`;
+          } else if (isComp) {
             qtyDisplay = `<span class="font-bold text-sky-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-bold">Aparte</span>`;
             prodBadge = `<span class="text-[10px] font-bold text-sky-700">(No suma meta)</span>`;
           } else if (isAmb) {
@@ -1296,7 +1362,7 @@
           }
 
           return `
-          <tr class="hover:bg-slate-50/80">
+          <tr class="hover:bg-slate-50/80 ${isRet ? 'bg-rose-50/30' : ''}">
             <td class="py-3 px-2 text-xs text-slate-500">${r.fecha}</td>
             <td class="py-3 px-2 font-semibold text-slate-800 text-xs">${r.cliente}</td>
             <td class="py-3 px-2">${getTipoBadgeHtml(parseTipoVenta(r))}</td>
@@ -1315,14 +1381,17 @@
       e.preventDefault();
       const btn = document.getElementById('btn-submit-report');
       btn.disabled = true;
+      const tipoSeleccionado = document.querySelector('input[name="tipo-venta"]:checked').value;
+      const isRetiro = normalizeText(tipoSeleccionado).includes('retiro');
+
       const newRep = {
         id: 'REP-' + Date.now(),
         fecha: document.getElementById('rep-fecha').value,
         phone: appState.session.phone,
         asesor: appState.session.name,
         cliente: document.getElementById('rep-cliente').value.trim(),
-        ramo: `[${document.querySelector('input[name="tipo-venta"]:checked').value}] ${document.getElementById('rep-ramo').value}`,
-        tipoVenta: document.querySelector('input[name="tipo-venta"]:checked').value,
+        ramo: `[${tipoSeleccionado}] ${document.getElementById('rep-ramo').value}`,
+        tipoVenta: tipoSeleccionado,
         polizas: Number(document.getElementById('rep-polizas').value) || 1
       };
       try {
@@ -1330,9 +1399,13 @@
         if (res && res.status === 'ok' && res.data) { appState.asesores = res.data.asesores; appState.reportes = res.data.reportes; }
         else { appState.reportes.push(newRep); }
         saveCache(); document.getElementById('rep-cliente').value = ''; document.getElementById('rep-polizas').value = '1';
-        renderAdvisorDashboard(); showToast('Venta registrada y netos actualizados.');
-      } catch (err) { appState.reportes.push(newRep); saveCache(); renderAdvisorDashboard(); showToast('Guardado localmente.', 'warning'); }
-      finally { btn.disabled = false; }
+        renderAdvisorDashboard();
+        showToast(isRetiro ? 'Retiro registrado y descontado de tus netos.' : 'Venta registrada y netos actualizados.', isRetiro ? 'warning' : 'success');
+      } catch (err) {
+        appState.reportes.push(newRep); saveCache(); renderAdvisorDashboard(); showToast('Guardado localmente.', 'warning');
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     // --- LÓGICA PANEL DIRECTOR ---
@@ -1379,6 +1452,7 @@
           ...p,
           name: p.cleanName,
           ventasAnio: 0,
+          retirosAnio: 0,
           ventasPeriodo: 0,
           compPeriodo: 0,
           ventasTrimestre: 0
@@ -1397,6 +1471,7 @@
             prodAnterior: 0,
             bajas: 0,
             ventasAnio: 0,
+            retirosAnio: 0,
             ventasPeriodo: 0,
             compPeriodo: 0,
             ventasTrimestre: 0
@@ -1405,8 +1480,11 @@
         const m = Number(String(r.fecha || '').split('-')[1] || 0);
         const qty = getEffectiveSales(r);
         const compQty = getComplementarySales(r);
+        const retQty = getRetiroSales(r);
 
         advisorMap[p].ventasAnio = fixTriples(advisorMap[p].ventasAnio + qty);
+        advisorMap[p].retirosAnio = fixTriples(advisorMap[p].retirosAnio + retQty);
+
         if (isMonthInQuarter(m, selQuarter)) advisorMap[p].ventasTrimestre = fixTriples(advisorMap[p].ventasTrimestre + qty);
         if (selMonth === 'ALL' || String(r.fecha).split('-')[1] === selMonth) {
           advisorMap[p].ventasPeriodo = fixTriples(advisorMap[p].ventasPeriodo + qty);
@@ -1415,7 +1493,7 @@
       });
 
       const advisorList = Object.values(advisorMap).map(a => {
-        const metrics = computeAdvisorMetrics(a, a.ventasAnio);
+        const metrics = computeAdvisorMetrics(a, a.ventasAnio, a.retirosAnio);
         return { ...a, metrics };
       }).sort((a, b) => b.ventasPeriodo - a.ventasPeriodo);
 
@@ -1468,6 +1546,7 @@
         }
 
         const growthColor = m.crecimientoUsuarios > 0 ? 'text-emerald-700' : (m.crecimientoUsuarios < 0 ? 'text-rose-600' : 'text-slate-600');
+        const bajasLabel = m.bajas > 0 ? ` · -${m.bajas} ret.` : '';
 
         return `
         <tr class="hover:bg-slate-50/80">
@@ -1476,7 +1555,7 @@
           <td class="py-3 px-2 text-center font-bold">${a.ventasPeriodo}</td>
           <td class="py-3 px-2 text-center">
             ${netosBadge}
-            <span class="block text-[10px] text-slate-400 mt-0.5">Base ${m.carteraBase} → Act. ${m.carteraActual}</span>
+            <span class="block text-[10px] text-slate-400 mt-0.5">Base ${m.carteraBase} → Act. ${m.carteraActual}${bajasLabel}</span>
           </td>
           <td class="py-3 px-2 text-center">
             <span class="font-bold text-xs ${growthColor}">${formatSignedNumber(m.crecimientoUsuarios)} (${m.crecimientoUsuarios >= 0 ? '+' : ''}${m.crecimientoPct}%)</span>
@@ -1494,12 +1573,17 @@
       document.getElementById('admin-reports-tbody').innerHTML = periodReports.length === 0 ? `<tr><td colspan="7" class="py-6 text-center text-slate-400">Sin movimientos</td></tr>` : periodReports.map(r => {
         const rawQty = Number(r.polizas) || 1;
         const effQty = getEffectiveSales(r);
+        const retQty = getRetiroSales(r);
+        const isRet = isRetiroReport(r);
         const isAmb = isAmbulatoriaReport(r);
         const isComp = isComplementaryReport(r);
         let qtyDisplay = `<span class="font-bold text-slate-900">${rawQty}</span>`;
         let prodBadge = '';
 
-        if (isComp) {
+        if (isRet) {
+          qtyDisplay = `<span class="font-bold text-rose-700">-${retQty}</span> <span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Neto</span>`;
+          prodBadge = `<span class="text-[10px] font-bold text-rose-600">(Baja cartera)</span>`;
+        } else if (isComp) {
           qtyDisplay = `<span class="font-bold text-sky-900">${rawQty}</span> <span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-bold">Aparte</span>`;
           prodBadge = `<span class="text-[10px] font-bold text-sky-700">(No suma meta)</span>`;
         } else if (isAmb) {
@@ -1508,7 +1592,7 @@
         }
 
         return `
-        <tr class="hover:bg-slate-50/80">
+        <tr class="hover:bg-slate-50/80 ${isRet ? 'bg-rose-50/30' : ''}">
           <td class="py-3 px-2 text-xs text-slate-500">${r.fecha}</td>
           <td class="py-3 px-2 font-semibold text-slate-800 text-xs">${cleanAdvisorDisplay(r.asesor)}</td>
           <td class="py-3 px-2 text-xs">${r.cliente}</td>
@@ -1640,7 +1724,7 @@
       updateConnectionIndicator(); closeSheetsModal(); await syncWithSheets(true);
     }
     function exportReportsCSV() {
-      const csv = '\uFEFF' + ['Fecha,Asesor,Cliente,Tipo,Producto,Polizas_Reportadas,Afiliaciones_Meta,Emermedica_SaludExpress'].join(',') + '\n' + appState.reportes.map(r => `${r.fecha},"${cleanAdvisorDisplay(r.asesor)}","${r.cliente}",${parseTipoVenta(r)},"${cleanProductoName(r)}",${r.polizas || 1},${getEffectiveSales(r)},${getComplementarySales(r)}`).join('\n');
+      const csv = '\uFEFF' + ['Fecha,Asesor,Cliente,Movimiento,Producto,Cantidad_Reportada,Afiliaciones_Meta,Retiros_Netos,Emermedica_SaludExpress'].join(',') + '\n' + appState.reportes.map(r => `${r.fecha},"${cleanAdvisorDisplay(r.asesor)}","${r.cliente}",${parseTipoVenta(r)},"${cleanProductoName(r)}",${r.polizas || 1},${getEffectiveSales(r)},${getRetiroSales(r)},${getComplementarySales(r)}`).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Reportes_${new Date().toISOString().slice(0,10)}.csv`;
       document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('Descargado.');
